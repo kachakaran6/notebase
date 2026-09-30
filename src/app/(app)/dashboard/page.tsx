@@ -30,6 +30,7 @@ import {
   ExternalLink,
   User,
   X,
+  Menu,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -43,6 +44,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet'
 import {
   Dialog,
   DialogContent,
@@ -152,8 +160,9 @@ export default function DashboardPage() {
   )
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
 
-  // Modals & Command Palette
+  // Modals, Drawers & Command Palette
   const [isCommandOpen, setIsCommandOpen] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [showQuickNoteModal, setShowQuickNoteModal] = useState(false)
   const [quickNoteTitle, setQuickNoteTitle] = useState('')
   const [quickNoteContent, setQuickNoteContent] = useState('')
@@ -207,6 +216,7 @@ export default function DashboardPage() {
         template: preset.id,
         visibility: 'private',
       })
+      setIsMobileMenuOpen(false)
       router.push(`/page/${newPage.id}`)
     } catch (err) {
       toast.error('Failed to create page')
@@ -314,142 +324,276 @@ export default function DashboardPage() {
   }, [pages, searchQuery, selectedFilter, sortBy])
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col font-inter">
-      {/* Top Navigation Header (Edge-to-edge) */}
-      <header className="border-b border-border bg-card sticky top-0 z-30 px-4 sm:px-6 lg:px-8 py-2.5 flex items-center justify-between">
-        {/* Left: App Logo & Name */}
-        <div className="flex items-center gap-2.5">
-          <Link href="/dashboard" className="flex items-center gap-2 text-foreground hover:opacity-85 transition">
-            <div className="w-7 h-7 rounded-md bg-secondary text-foreground flex items-center justify-center border border-border">
-              <NotebookPen className="w-4 h-4 text-primary" />
-            </div>
-            <span className="text-sm font-semibold tracking-tight">
-              Pages
-            </span>
-          </Link>
+    <div className="min-h-screen bg-background text-foreground flex flex-col font-inter w-full overflow-x-hidden">
+      {/* Top Navigation Header (Fully Responsive) */}
+      <header className="border-b border-border bg-card sticky top-0 z-30 px-3.5 sm:px-6 lg:px-8 py-2.5">
+        {/* Main Row */}
+        <div className="flex items-center justify-between gap-3">
+          {/* Left: App Logo & Name */}
+          <div className="flex items-center gap-2.5 shrink-0">
+            <Link href="/dashboard" className="flex items-center gap-2 text-foreground hover:opacity-85 transition">
+              <div className="w-7 h-7 rounded-md bg-secondary text-foreground flex items-center justify-center border border-border shrink-0">
+                <NotebookPen className="w-4 h-4 text-primary" />
+              </div>
+              <span className="text-sm font-semibold tracking-tight">
+                Pages
+              </span>
+            </Link>
+          </div>
+
+          {/* Center Search Field (Desktop & Tablet) */}
+          <div className="hidden sm:flex items-center flex-1 max-w-xs md:max-w-sm lg:max-w-md mx-2">
+            <button
+              type="button"
+              onClick={() => setIsCommandOpen(true)}
+              className="w-full h-8 px-3 rounded-lg border border-border bg-background hover:bg-muted text-left text-xs text-muted-foreground flex items-center justify-between transition cursor-pointer min-w-0"
+            >
+              <div className="flex items-center gap-2 min-w-0">
+                <Search className="w-3.5 h-3.5 text-subtle-foreground shrink-0" />
+                <span className="truncate">Search pages, notes, prompts...</span>
+              </div>
+              <kbd className="text-[10px] font-mono bg-card px-1.5 py-0.5 rounded border border-border text-subtle-foreground shrink-0 ml-2">
+                ⌘K
+              </kbd>
+            </button>
+          </div>
+
+          {/* Right Actions (Desktop / Tablet) */}
+          <div className="hidden sm:flex items-center gap-2 shrink-0">
+            {/* Quick Note Button */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowQuickNoteModal(true)}
+              className="text-xs font-medium gap-1.5 h-8 px-2.5"
+            >
+              <span>Quick Note</span>
+            </Button>
+
+            {/* New Page Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button size="sm" className="text-xs font-medium gap-1 h-8 px-2.5">
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>New Page</span>
+                  <ChevronDown className="w-3 h-3 opacity-70 ml-0.5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>Create with template</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {TEMPLATE_PRESETS.map((tmpl) => {
+                  const IconComponent = tmpl.icon
+                  return (
+                    <DropdownMenuItem
+                      key={tmpl.id}
+                      onClick={() => handleCreateWithTemplate(tmpl.id)}
+                      className="flex items-start gap-2 py-2"
+                    >
+                      <IconComponent className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+                      <div className="min-w-0">
+                        <div className="font-medium text-xs text-foreground truncate">{tmpl.label}</div>
+                        <div className="text-[11px] text-muted-foreground truncate">{tmpl.description}</div>
+                      </div>
+                    </DropdownMenuItem>
+                  )
+                })}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            <div className="h-4 w-px bg-border mx-0.5" />
+
+            {/* Theme Toggle */}
+            <ThemeToggle />
+
+            {/* User Dropdown Menu */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  type="button"
+                  className="w-8 h-8 rounded-lg border border-border bg-card text-foreground hover:bg-muted flex items-center justify-center text-xs font-medium transition cursor-pointer shrink-0"
+                  title={userEmail || 'Account'}
+                >
+                  {userEmail ? userEmail.charAt(0).toUpperCase() : <User className="w-3.5 h-3.5" />}
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-52">
+                <DropdownMenuLabel>
+                  <div className="text-xs font-medium text-foreground truncate">
+                    {userEmail || 'My Account'}
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => setIsCommandOpen(true)}>
+                  <Search className="w-3.5 h-3.5 mr-2 text-muted-foreground" />
+                  <span>Command Menu</span>
+                  <span className="ml-auto text-[10px] font-mono text-subtle-foreground">⌘K</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleCreateWithTemplate('blank')}>
+                  <FilePlus className="w-3.5 h-3.5 mr-2 text-muted-foreground" />
+                  <span>New Blank Document</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:text-destructive">
+                  <LogOut className="w-3.5 h-3.5 mr-2" />
+                  <span>Sign Out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          {/* Right Mobile Header Controls (Phone View) */}
+          <div className="flex sm:hidden items-center gap-1.5 shrink-0">
+            {/* Quick New Page Button */}
+            <Button
+              size="sm"
+              onClick={() => handleCreateWithTemplate('blank')}
+              className="h-8 px-2 text-xs font-medium gap-1"
+              title="New Blank Page"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>New</span>
+            </Button>
+
+            <ThemeToggle />
+
+            {/* Mobile Sheet Navigation Drawer */}
+            <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <button
+                  type="button"
+                  className="w-8 h-8 rounded-lg border border-border bg-card text-foreground hover:bg-muted flex items-center justify-center transition cursor-pointer"
+                  title="Open Navigation Menu"
+                  aria-label="Navigation Menu"
+                >
+                  <Menu className="w-4 h-4" />
+                </button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[85vw] max-w-xs p-5 flex flex-col justify-between">
+                <div>
+                  <SheetHeader className="pb-4 border-b border-border text-left">
+                    <div className="flex items-center gap-2">
+                      <div className="w-7 h-7 rounded-md bg-secondary text-foreground flex items-center justify-center border border-border shrink-0">
+                        <NotebookPen className="w-4 h-4 text-primary" />
+                      </div>
+                      <SheetTitle className="text-sm font-semibold">Pages</SheetTitle>
+                    </div>
+                    {userEmail && (
+                      <div className="text-[11px] text-muted-foreground truncate pt-1 font-mono">
+                        {userEmail}
+                      </div>
+                    )}
+                  </SheetHeader>
+
+                  {/* Actions List */}
+                  <div className="py-4 space-y-1">
+                    <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground px-2 py-1">
+                      Quick Actions
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        setIsMobileMenuOpen(false)
+                        setShowQuickNoteModal(true)
+                      }}
+                      className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs font-medium text-foreground hover:bg-muted transition text-left cursor-pointer"
+                    >
+                      <NotebookPen className="w-4 h-4 text-muted-foreground" />
+                      <span>Quick Note</span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        setIsMobileMenuOpen(false)
+                        setIsCommandOpen(true)
+                      }}
+                      className="w-full flex items-center justify-between px-2.5 py-2 rounded-lg text-xs font-medium text-foreground hover:bg-muted transition text-left cursor-pointer"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <Search className="w-4 h-4 text-muted-foreground" />
+                        <span>Search & Jump</span>
+                      </div>
+                      <kbd className="text-[10px] font-mono bg-card px-1.5 py-0.5 rounded border border-border text-subtle-foreground">
+                        ⌘K
+                      </kbd>
+                    </button>
+
+                    {/* Template creation */}
+                    <div className="pt-3">
+                      <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground px-2 py-1">
+                        New Document
+                      </div>
+                      <div className="space-y-1 pt-1">
+                        {TEMPLATE_PRESETS.map((tmpl) => {
+                          const IconComp = tmpl.icon
+                          return (
+                            <button
+                              key={tmpl.id}
+                              onClick={() => handleCreateWithTemplate(tmpl.id)}
+                              className="w-full flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs text-foreground hover:bg-muted transition text-left cursor-pointer"
+                            >
+                              <IconComp className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                              <span className="truncate">{tmpl.label}</span>
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bottom Signout */}
+                <div className="pt-3 border-t border-border">
+                  <button
+                    onClick={handleSignOut}
+                    className="w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-xs font-medium text-destructive hover:bg-destructive/10 transition text-left cursor-pointer"
+                  >
+                    <LogOut className="w-4 h-4 shrink-0" />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
 
-        {/* Center: Search Field */}
-        <div className="hidden sm:flex items-center flex-1 max-w-md mx-6">
+        {/* Second Row on Mobile: Full-Width Search Bar */}
+        <div className="sm:hidden pt-2.5">
           <button
             type="button"
             onClick={() => setIsCommandOpen(true)}
-            className="w-full h-8 px-3 rounded-lg border border-border bg-background hover:bg-muted text-left text-xs text-muted-foreground flex items-center justify-between transition cursor-pointer"
+            className="w-full h-8 px-3 rounded-lg border border-border bg-background hover:bg-muted text-left text-xs text-muted-foreground flex items-center justify-between transition cursor-pointer min-w-0"
           >
-            <div className="flex items-center gap-2">
-              <Search className="w-3.5 h-3.5 text-subtle-foreground" />
-              <span>Search pages, notes, prompts...</span>
+            <div className="flex items-center gap-2 min-w-0">
+              <Search className="w-3.5 h-3.5 text-subtle-foreground shrink-0" />
+              <span className="truncate">Search pages...</span>
             </div>
-            <kbd className="text-[10px] font-mono bg-card px-1.5 py-0.5 rounded border border-border text-subtle-foreground">
+            <kbd className="text-[10px] font-mono bg-card px-1.5 py-0.5 rounded border border-border text-subtle-foreground shrink-0">
               ⌘K
             </kbd>
           </button>
         </div>
-
-        {/* Right: Actions */}
-        <div className="flex items-center gap-2">
-          {/* Quick Note Button */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowQuickNoteModal(true)}
-            className="text-xs font-medium gap-1.5 h-8"
-          >
-            <span>Quick Note</span>
-          </Button>
-
-          {/* New Page Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button size="sm" className="text-xs font-medium gap-1 h-8">
-                <Plus className="w-3.5 h-3.5" />
-                <span>New Page</span>
-                <ChevronDown className="w-3 h-3 opacity-70 ml-0.5" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>Create with template</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              {TEMPLATE_PRESETS.map((tmpl) => {
-                const IconComponent = tmpl.icon
-                return (
-                  <DropdownMenuItem
-                    key={tmpl.id}
-                    onClick={() => handleCreateWithTemplate(tmpl.id)}
-                    className="flex items-start gap-2 py-2"
-                  >
-                    <IconComponent className="w-4 h-4 text-muted-foreground mt-0.5" />
-                    <div>
-                      <div className="font-medium text-xs text-foreground">{tmpl.label}</div>
-                      <div className="text-[11px] text-muted-foreground">{tmpl.description}</div>
-                    </div>
-                  </DropdownMenuItem>
-                )
-              })}
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <div className="h-4 w-px bg-border mx-1" />
-
-          {/* Theme Toggle */}
-          <ThemeToggle />
-
-          {/* User Dropdown Menu */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                type="button"
-                className="w-8 h-8 rounded-lg border border-border bg-card text-foreground hover:bg-muted flex items-center justify-center text-xs font-medium transition cursor-pointer"
-                title={userEmail || 'Account'}
-              >
-                {userEmail ? userEmail.charAt(0).toUpperCase() : <User className="w-3.5 h-3.5" />}
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-52">
-              <DropdownMenuLabel>
-                <div className="text-xs font-medium text-foreground truncate">
-                  {userEmail || 'My Account'}
-                </div>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => setIsCommandOpen(true)}>
-                <Search className="w-3.5 h-3.5 mr-2 text-muted-foreground" />
-                <span>Command Menu</span>
-                <span className="ml-auto text-[10px] font-mono text-subtle-foreground">⌘K</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleCreateWithTemplate('blank')}>
-                <FilePlus className="w-3.5 h-3.5 mr-2 text-muted-foreground" />
-                <span>New Blank Document</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:text-destructive">
-                <LogOut className="w-3.5 h-3.5 mr-2" />
-                <span>Sign Out</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
       </header>
 
-      {/* Main Content Area (Full width, responsive padding) */}
-      <main className="flex-1 w-full px-4 sm:px-6 lg:px-8 py-6">
+      {/* Main Content Area */}
+      <main className="flex-1 w-full max-w-[1400px] mx-auto px-3.5 sm:px-6 lg:px-8 py-4 sm:py-6">
         {/* Top Header Section */}
-        <div className="mb-5">
-          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-foreground mb-1">
+        <div className="mb-4 sm:mb-5">
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-foreground mb-1 break-words">
             Pages
           </h1>
-          <p className="text-xs sm:text-sm text-secondary-foreground font-normal">
+          <p className="text-xs sm:text-sm text-secondary-foreground font-normal max-w-full break-words">
             Create, organize and share your notes, prompts and ideas.
           </p>
         </div>
 
         {/* Navigation Controls Bar */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 border-b border-border pb-2 mb-5">
-          {/* Tab Filtering */}
-          <div className="flex items-center gap-6 text-xs font-medium">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 border-b border-border pb-2 mb-4 sm:mb-5">
+          {/* Tab Filtering (Responsive & Compact) */}
+          <div className="flex items-center gap-4 sm:gap-6 text-xs font-medium overflow-x-auto scrollbar-none py-1 -mb-[9px] min-w-0">
             <button
               onClick={() => setSelectedFilter('all')}
-              className={`pb-2 transition-colors border-b-2 -mb-[9px] cursor-pointer ${
+              className={`pb-2 transition-colors border-b-2 cursor-pointer shrink-0 ${
                 selectedFilter === 'all'
                   ? 'border-primary text-foreground font-semibold'
                   : 'border-transparent text-muted-foreground hover:text-foreground'
@@ -459,7 +603,7 @@ export default function DashboardPage() {
             </button>
             <button
               onClick={() => setSelectedFilter('private')}
-              className={`pb-2 transition-colors border-b-2 -mb-[9px] cursor-pointer flex items-center gap-1.5 ${
+              className={`pb-2 transition-colors border-b-2 cursor-pointer flex items-center gap-1.5 shrink-0 ${
                 selectedFilter === 'private'
                   ? 'border-primary text-foreground font-semibold'
                   : 'border-transparent text-muted-foreground hover:text-foreground'
@@ -470,7 +614,7 @@ export default function DashboardPage() {
             </button>
             <button
               onClick={() => setSelectedFilter('unlisted')}
-              className={`pb-2 transition-colors border-b-2 -mb-[9px] cursor-pointer flex items-center gap-1.5 ${
+              className={`pb-2 transition-colors border-b-2 cursor-pointer flex items-center gap-1.5 shrink-0 ${
                 selectedFilter === 'unlisted'
                   ? 'border-primary text-foreground font-semibold'
                   : 'border-transparent text-muted-foreground hover:text-foreground'
@@ -481,7 +625,7 @@ export default function DashboardPage() {
             </button>
             <button
               onClick={() => setSelectedFilter('public')}
-              className={`pb-2 transition-colors border-b-2 -mb-[9px] cursor-pointer flex items-center gap-1.5 ${
+              className={`pb-2 transition-colors border-b-2 cursor-pointer flex items-center gap-1.5 shrink-0 ${
                 selectedFilter === 'public'
                   ? 'border-primary text-foreground font-semibold'
                   : 'border-transparent text-muted-foreground hover:text-foreground'
@@ -493,7 +637,7 @@ export default function DashboardPage() {
           </div>
 
           {/* Right Controls: Sort & Layout Toggle */}
-          <div className="flex items-center gap-2 pb-1">
+          <div className="flex items-center justify-between sm:justify-end gap-2 shrink-0 pt-1 sm:pt-0">
             {/* Sort Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -527,6 +671,7 @@ export default function DashboardPage() {
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
                 title="Grid view"
+                aria-label="Grid view"
               >
                 <LayoutGrid className="w-3.5 h-3.5" />
               </button>
@@ -538,6 +683,7 @@ export default function DashboardPage() {
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
                 title="List view"
+                aria-label="List view"
               >
                 <ListIcon className="w-3.5 h-3.5" />
               </button>
@@ -547,20 +693,20 @@ export default function DashboardPage() {
 
         {/* Content Section */}
         {loading ? (
-          <div className="py-24 flex flex-col items-center justify-center text-muted-foreground">
+          <div className="py-20 flex flex-col items-center justify-center text-muted-foreground">
             <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin mb-3" />
             <p className="text-xs">Loading pages...</p>
           </div>
         ) : filteredPages.length === 0 ? (
           /* Empty State */
-          <div className="py-16 text-center max-w-md mx-auto">
+          <div className="py-12 sm:py-16 text-center max-w-md w-full mx-auto px-2">
             <div className="w-10 h-10 mx-auto mb-3 rounded-lg border border-border bg-card flex items-center justify-center text-muted-foreground">
               <FileText className="w-5 h-5 text-muted-foreground" />
             </div>
             <h3 className="text-sm font-semibold text-foreground mb-1">
               {searchQuery ? 'No matching pages' : 'No pages yet'}
             </h3>
-            <p className="text-xs text-muted-foreground mb-6 leading-relaxed">
+            <p className="text-xs text-muted-foreground mb-5 leading-relaxed">
               {searchQuery
                 ? 'Try a different search keyword or clear the active filter.'
                 : 'Create your first page or start with a template.'}
@@ -585,7 +731,7 @@ export default function DashboardPage() {
           </div>
         ) : viewMode === 'grid' ? (
           /* Responsive Edge-to-Edge Grid of Document Cards */
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-3.5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 sm:gap-3.5">
             {filteredPages.map((page) => {
               const isPublic = page.visibility === 'public'
               const isUnlisted = page.visibility === 'unlisted'
@@ -597,25 +743,26 @@ export default function DashboardPage() {
                 <div
                   key={page.id}
                   onClick={() => router.push(`/page/${page.id}`)}
-                  className="doc-card group relative p-3.5 sm:p-4 rounded-xl border border-border bg-card cursor-pointer flex flex-col justify-between hover:bg-card/90 transition shadow-2xs"
+                  className="doc-card group relative p-3.5 sm:p-4 rounded-xl border border-border bg-card cursor-pointer flex flex-col justify-between hover:bg-card/90 transition shadow-2xs w-full min-w-0"
                 >
-                  <div>
+                  <div className="min-w-0">
                     {/* Top row: Icon + Title + More menu */}
-                    <div className="flex items-start justify-between gap-2 mb-2">
-                      <div className="flex items-center gap-2 min-w-0">
+                    <div className="flex items-start justify-between gap-2 mb-2 min-w-0">
+                      <div className="flex items-center gap-2 min-w-0 flex-1">
                         <FileText className="w-4 h-4 text-muted-foreground shrink-0" />
-                        <h3 className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors truncate">
+                        <h3 className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors truncate min-w-0">
                           {page.title || 'Untitled'}
                         </h3>
                       </div>
 
-                      <div onClick={(e) => e.stopPropagation()}>
+                      <div onClick={(e) => e.stopPropagation()} className="shrink-0">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <button
                               type="button"
                               className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted transition cursor-pointer"
                               title="More actions"
+                              aria-label="More actions"
                             >
                               <MoreHorizontal className="w-3.5 h-3.5" />
                             </button>
@@ -646,19 +793,19 @@ export default function DashboardPage() {
                     </div>
 
                     {/* Middle preview */}
-                    <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed mb-4">
+                    <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed mb-3.5 break-words min-w-0">
                       {snippet}
                     </p>
                   </div>
 
-                  {/* Bottom metadata */}
-                  <div className="pt-2.5 border-t border-border/50 flex items-center justify-between text-[11px] text-muted-foreground">
-                    <div className="flex items-center gap-1">
+                  {/* Bottom metadata (Responsive wrap) */}
+                  <div className="pt-2.5 border-t border-border/50 flex flex-wrap items-center justify-between gap-1.5 text-[11px] text-muted-foreground min-w-0">
+                    <div className="flex items-center gap-1 shrink-0">
                       <Clock className="w-3 h-3 text-subtle-foreground" />
                       <span>{formatRelativeTime(page.updatedAt)}</span>
                     </div>
 
-                    <div className="flex items-center gap-1 text-muted-foreground">
+                    <div className="flex items-center gap-1 text-muted-foreground shrink-0">
                       {isPublic ? (
                         <>
                           <Globe className="w-3 h-3 text-muted-foreground" />
@@ -683,7 +830,7 @@ export default function DashboardPage() {
           </div>
         ) : (
           /* List View */
-          <div className="rounded-xl border border-border bg-card overflow-hidden">
+          <div className="rounded-xl border border-border bg-card overflow-hidden w-full">
             <div className="divide-y divide-border/60">
               {filteredPages.map((page) => {
                 const isPublic = page.visibility === 'public'
@@ -693,19 +840,17 @@ export default function DashboardPage() {
                   <div
                     key={page.id}
                     onClick={() => router.push(`/page/${page.id}`)}
-                    className="p-3.5 flex items-center justify-between hover:bg-muted/40 cursor-pointer transition-colors group"
+                    className="p-3 sm:p-3.5 flex items-center justify-between gap-3 hover:bg-muted/40 cursor-pointer transition-colors group min-w-0"
                   >
-                    <div className="flex items-center gap-3 min-w-0">
+                    <div className="flex items-center gap-2.5 min-w-0 flex-1">
                       <FileText className="w-4 h-4 text-muted-foreground shrink-0" />
-                      <div className="min-w-0">
-                        <h4 className="font-semibold text-xs text-foreground group-hover:text-primary transition-colors truncate">
-                          {page.title || 'Untitled'}
-                        </h4>
-                      </div>
+                      <h4 className="font-semibold text-xs text-foreground group-hover:text-primary transition-colors truncate min-w-0">
+                        {page.title || 'Untitled'}
+                      </h4>
                     </div>
 
-                    <div className="flex items-center gap-4 text-xs text-muted-foreground shrink-0" onClick={(e) => e.stopPropagation()}>
-                      <span className="text-[11px] text-subtle-foreground hidden sm:inline">
+                    <div className="flex items-center gap-3 text-xs text-muted-foreground shrink-0" onClick={(e) => e.stopPropagation()}>
+                      <span className="text-[11px] text-subtle-foreground hidden md:inline">
                         {formatRelativeTime(page.updatedAt)}
                       </span>
 
@@ -732,6 +877,7 @@ export default function DashboardPage() {
                         onClick={(e) => handleCopyLink(page, e)}
                         title="Copy Link"
                         className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted transition cursor-pointer"
+                        aria-label="Copy link"
                       >
                         {copiedId === page.id ? (
                           <Check className="w-3.5 h-3.5 text-success" />
@@ -747,6 +893,7 @@ export default function DashboardPage() {
                         }}
                         title="Delete"
                         className="p-1 rounded text-muted-foreground hover:text-destructive hover:bg-muted transition cursor-pointer"
+                        aria-label="Delete page"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>

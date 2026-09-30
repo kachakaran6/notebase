@@ -304,33 +304,34 @@ export default function PageEditorPage() {
     <div
       className={`min-h-screen ${currentFontClass} ${currentBgClass} flex flex-col font-inter transition-colors`}
     >
-      {/* Top Application Bar */}
-      <header className="sticky top-0 z-30 border-b border-border bg-card px-4 sm:px-6 lg:px-8 py-2.5 flex items-center justify-between">
+      {/* Top Application Bar (Fully responsive) */}
+      <header className="sticky top-0 z-30 border-b border-border bg-card px-3 sm:px-6 lg:px-8 py-2 sm:py-2.5 flex items-center justify-between gap-2 min-w-0">
         {/* Left: Breadcrumbs / Back */}
-        <div className="flex items-center gap-2 text-xs">
+        <div className="flex items-center gap-1.5 sm:gap-2 text-xs min-w-0">
           <Link
             href="/dashboard"
-            className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition font-medium"
+            className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition font-medium shrink-0 p-1 -ml-1 rounded hover:bg-muted"
+            title="Back to Pages"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Pages</span>
+            <span className="hidden xs:inline">Pages</span>
           </Link>
-          <span className="text-border">/</span>
-          <span className="text-foreground font-semibold truncate max-w-[240px]">
+          <span className="text-border shrink-0">/</span>
+          <span className="text-foreground font-semibold truncate max-w-[90px] xs:max-w-[140px] sm:max-w-[240px]">
             {title || 'Untitled'}
           </span>
         </div>
 
         {/* Right: Actions */}
-        <div className="flex items-center gap-2">
-          {/* Status Indicator */}
-          <div className="text-[11px] text-muted-foreground mr-1 hidden sm:inline-flex items-center gap-1.5 font-normal">
+        <div className="flex items-center gap-1 sm:gap-2 shrink-0">
+          {/* Status Indicator (Desktop only) */}
+          <div className="text-[11px] text-muted-foreground mr-1 hidden lg:inline-flex items-center gap-1.5 font-normal">
             {isSaving ? (
               <span className="flex items-center gap-1 text-primary">
                 <RefreshCw className="w-3 h-3 animate-spin" /> Saving...
               </span>
             ) : hasUnsavedChanges ? (
-              <span className="text-warning">Unsaved changes</span>
+              <span className="text-warning">Unsaved</span>
             ) : lastSaved ? (
               <span className="text-subtle-foreground">
                 Saved {lastSaved.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -341,23 +342,23 @@ export default function PageEditorPage() {
           {/* Visibility Selector */}
           <button
             onClick={handleOpenShare}
-            className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground px-2 py-1 rounded border border-border bg-background transition cursor-pointer"
+            className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground px-2 py-1 rounded border border-border bg-background transition cursor-pointer shrink-0"
             title="Manage sharing"
           >
             {visibility === 'public' ? (
               <>
                 <Globe className="w-3 h-3 text-muted-foreground" />
-                <span>Public</span>
+                <span className="hidden sm:inline">Public</span>
               </>
             ) : visibility === 'unlisted' ? (
               <>
                 <LinkIcon className="w-3 h-3 text-muted-foreground" />
-                <span>Shared</span>
+                <span className="hidden sm:inline">Shared</span>
               </>
             ) : (
               <>
                 <Lock className="w-3 h-3 text-subtle-foreground" />
-                <span>Private</span>
+                <span className="hidden sm:inline">Private</span>
               </>
             )}
           </button>
@@ -368,13 +369,14 @@ export default function PageEditorPage() {
               <Button
                 variant="outline"
                 size="sm"
-                className="text-xs font-normal gap-1 h-8 px-2.5"
+                className="text-xs font-normal gap-1 h-8 px-2 sm:px-2.5 shrink-0"
+                title="Document Style"
               >
                 <Palette className="w-3.5 h-3.5 text-muted-foreground" />
                 <span className="hidden sm:inline">Style</span>
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-72 p-3 space-y-3" align="end">
+            <PopoverContent className="w-[calc(100vw-32px)] sm:w-72 p-3 space-y-3" align="end">
               <div className="text-xs font-semibold text-foreground pb-1.5 border-b border-border">
                 Document Appearance
               </div>
@@ -438,10 +440,11 @@ export default function PageEditorPage() {
             variant="outline"
             size="sm"
             onClick={handleOpenShare}
-            className="text-xs font-normal gap-1 h-8 px-2.5"
+            className="text-xs font-normal gap-1 h-8 px-2 sm:px-2.5 shrink-0"
+            title="Share Document"
           >
             <Share2 className="w-3.5 h-3.5 text-muted-foreground" />
-            <span>Share</span>
+            <span className="hidden sm:inline">Share</span>
           </Button>
 
           {/* Save Button */}
@@ -449,22 +452,22 @@ export default function PageEditorPage() {
             size="sm"
             onClick={handleSave}
             disabled={isSaving}
-            className="text-xs font-medium gap-1 h-8 px-3"
+            className="text-xs font-medium gap-1 h-8 px-2.5 sm:px-3 shrink-0"
             title="Save Document (Ctrl+S)"
           >
-            <Save className="w-3.5 h-3.5" />
-            <span>Save</span>
+            {isSaving ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+            <span className="hidden xs:inline">{isSaving ? 'Saving' : 'Save'}</span>
           </Button>
 
-          <div className="h-4 w-px bg-border mx-0.5" />
+          <div className="h-4 w-px bg-border mx-0.5 hidden xs:block" />
           <ThemeToggle />
         </div>
       </header>
 
-      {/* Editor Main Canvas (Expansive, compact, readable) */}
-      <main className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      {/* Editor Main Canvas */}
+      <main className="flex-1 w-full max-w-6xl mx-auto px-3.5 sm:px-6 lg:px-8 py-4 sm:py-6 min-w-0">
         {/* Document Title Header */}
-        <div className="mb-4 space-y-1">
+        <div className="mb-3 sm:mb-4 space-y-1 min-w-0">
           <input
             type="text"
             value={title}
@@ -473,7 +476,7 @@ export default function PageEditorPage() {
               setTitle(e.target.value)
               setHasUnsavedChanges(true)
             }}
-            className="w-full bg-transparent border-none outline-none font-semibold text-2xl sm:text-3xl text-foreground placeholder:text-subtle-foreground/60 tracking-tight leading-tight"
+            className="w-full bg-transparent border-none outline-none font-semibold text-xl sm:text-2xl md:text-3xl text-foreground placeholder:text-subtle-foreground/60 tracking-tight leading-tight min-w-0 break-words"
           />
         </div>
 

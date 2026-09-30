@@ -84,7 +84,7 @@ export default function TiptapEditor({
     editorProps: {
       attributes: {
         class:
-          'ProseMirror min-h-[480px] p-4 sm:p-6 lg:p-7 focus:outline-none text-foreground leading-relaxed text-sm sm:text-base font-inter selection:bg-primary/20',
+          'ProseMirror min-h-[460px] p-3.5 sm:p-6 lg:p-7 focus:outline-none text-foreground leading-relaxed text-sm sm:text-base font-inter selection:bg-primary/20 break-words w-full min-w-0 max-w-full',
       },
     },
     immediatelyRender: false,
@@ -152,12 +152,12 @@ export default function TiptapEditor({
     : 'Text'
 
   return (
-    <div className="w-full flex flex-col rounded-xl border border-border bg-card shadow-xs overflow-hidden transition-colors">
-      {/* Editorial Formatting Toolbar */}
+    <div className="w-full flex flex-col rounded-xl border border-border bg-card shadow-xs overflow-hidden transition-colors min-w-0">
+      {/* Editorial Formatting Toolbar (Smooth scroll on small mobile) */}
       {editable && (
-        <div className="border-b border-border bg-surface-secondary px-3 py-1.5 flex flex-wrap items-center gap-1 text-muted-foreground select-none">
+        <div className="border-b border-border bg-surface-secondary px-2 sm:px-3 py-1.5 flex items-center gap-1 text-muted-foreground select-none overflow-x-auto scrollbar-none w-full min-w-0">
           {/* Undo / Redo */}
-          <div className="flex items-center">
+          <div className="flex items-center shrink-0">
             <button
               type="button"
               onClick={() => editor.chain().focus().undo().run()}

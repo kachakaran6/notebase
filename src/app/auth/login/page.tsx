@@ -60,7 +60,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col justify-between font-inter selection:bg-primary/20 selection:text-primary">
       {/* Top Bar */}
-      <header className="px-6 py-4 flex items-center justify-between">
+      <header className="px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
         <Link
           href="/"
           className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition font-medium"
@@ -72,9 +72,9 @@ export default function LoginPage() {
       </header>
 
       {/* Main Card */}
-      <main className="flex-1 flex items-center justify-center px-4 py-8">
+      <main className="flex-1 flex items-center justify-center px-3 sm:px-4 py-6 sm:py-8 min-w-0">
         <div className="w-full max-w-sm">
-          <div className="border border-border bg-card p-6 sm:p-7 rounded-xl shadow-xs space-y-5">
+          <div className="border border-border bg-card p-5 sm:p-7 rounded-xl shadow-xs space-y-4 sm:space-y-5 min-w-0">
             {/* Header */}
             <div className="space-y-1 text-left">
               <div className="w-8 h-8 rounded-md bg-secondary text-foreground flex items-center justify-center border border-border mb-3">

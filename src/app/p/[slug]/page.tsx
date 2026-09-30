@@ -48,9 +48,9 @@ export default async function PublicPage({ params }: Props) {
     >
       {/* Top Banner Header (Edge-to-edge) */}
       <header className="border-b border-border bg-card sticky top-0 z-30">
-        <div className="w-full px-4 sm:px-6 lg:px-8 h-12 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 text-foreground hover:opacity-85 transition">
-            <div className="w-6 h-6 rounded-md bg-secondary text-foreground flex items-center justify-center border border-border">
+        <div className="w-full px-3.5 sm:px-6 lg:px-8 h-12 flex items-center justify-between gap-2 min-w-0">
+          <Link href="/" className="flex items-center gap-2 text-foreground hover:opacity-85 transition shrink-0">
+            <div className="w-6 h-6 rounded-md bg-secondary text-foreground flex items-center justify-center border border-border shrink-0">
               <NotebookPen className="w-3.5 h-3.5 text-primary" />
             </div>
             <span className="font-semibold text-xs tracking-tight">
@@ -58,8 +58,8 @@ export default async function PublicPage({ params }: Props) {
             </span>
           </Link>
 
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1 text-[11px] text-muted-foreground mr-2">
+          <div className="flex items-center gap-2 shrink-0">
+            <div className="flex items-center gap-1 text-[11px] text-muted-foreground mr-1">
               <Globe className="w-3 h-3" />
               <span>Public</span>
             </div>
@@ -69,18 +69,20 @@ export default async function PublicPage({ params }: Props) {
       </header>
 
       {/* Main Document Content */}
-      <main className="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-        <article className="space-y-6">
-          <div className="space-y-2">
-            <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-foreground leading-tight">
+      <main className="flex-1 max-w-4xl w-full mx-auto px-3.5 sm:px-6 lg:px-8 py-6 sm:py-8 md:py-12 min-w-0">
+        <article className="space-y-5 sm:space-y-6 min-w-0">
+          <div className="space-y-2 min-w-0">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight text-foreground leading-tight break-words">
               {page.title}
             </h1>
 
-            <div className="flex items-center gap-2 text-xs text-muted-foreground pb-4 border-b border-border">
-              <Clock className="w-3.5 h-3.5 text-subtle-foreground" />
-              <span>
-                {new Date(page.createdAt).toLocaleDateString(undefined, { dateStyle: 'medium' })}
-              </span>
+            <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground pb-4 border-b border-border">
+              <div className="flex items-center gap-1">
+                <Clock className="w-3.5 h-3.5 text-subtle-foreground" />
+                <span>
+                  {new Date(page.createdAt).toLocaleDateString(undefined, { dateStyle: 'medium' })}
+                </span>
+              </div>
               <span>•</span>
               <span>{readingTimeMinutes} min read</span>
             </div>
@@ -88,7 +90,7 @@ export default async function PublicPage({ params }: Props) {
 
           {/* Rendered Content */}
           <div
-            className="ProseMirror text-foreground leading-relaxed text-sm sm:text-base"
+            className="ProseMirror text-foreground leading-relaxed text-sm sm:text-base break-words w-full min-w-0 max-w-full"
             dangerouslySetInnerHTML={{
               __html:
                 page.content ||
@@ -100,7 +102,7 @@ export default async function PublicPage({ params }: Props) {
 
       {/* Subtle Footer */}
       <footer className="border-t border-border py-6 text-xs text-muted-foreground">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+        <div className="max-w-4xl mx-auto px-3.5 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
           <span>Published with Pages</span>
           <Link href="/auth/signup" className="text-primary hover:underline font-medium">
             Create your notebook
