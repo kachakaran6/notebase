@@ -4,21 +4,18 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
-  BookOpen,
+  NotebookPen,
   Mail,
   Lock,
   Eye,
   EyeOff,
   ArrowRight,
-  Sparkles,
-  CheckCircle2,
   ArrowLeft,
   Loader2,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { toast } from 'sonner'
 
@@ -48,7 +45,7 @@ export default function LoginPage() {
         throw new Error(data.error || 'Failed to sign in')
       }
 
-      toast.success('Welcome back to your notebook!')
+      toast.success('Signed in successfully')
       router.push('/dashboard')
       router.refresh()
     } catch (err) {
@@ -61,141 +58,129 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col justify-between selection:bg-primary/20 selection:text-primary relative overflow-hidden">
-      {/* Background ambient lighting */}
-      <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-blue-500/10 dark:bg-blue-500/15 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-indigo-500/10 dark:bg-purple-500/15 rounded-full blur-[140px] pointer-events-none" />
-
-      {/* Top Navigation */}
-      <header className="px-6 py-4 flex items-center justify-between z-20">
+    <div className="min-h-screen bg-background text-foreground flex flex-col justify-between font-inter selection:bg-primary/20 selection:text-primary">
+      {/* Top Bar */}
+      <header className="px-6 py-4 flex items-center justify-between">
         <Link
           href="/"
-          className="inline-flex items-center gap-2 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors group"
+          className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition font-medium"
         >
-          <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
-          <span>Back to Home</span>
+          <ArrowLeft className="w-3.5 h-3.5" />
+          <span>Home</span>
         </Link>
         <ThemeToggle />
       </header>
 
-      {/* Centered Auth Box */}
-      <main className="flex-1 flex items-center justify-center px-4 py-8 z-10">
-        <div className="w-full max-w-md">
-          <Card className="border border-border/80 bg-card/85 backdrop-blur-2xl shadow-2xl rounded-3xl overflow-hidden p-2 sm:p-4">
-            <CardContent className="p-6 sm:p-8 space-y-6">
-              {/* Logo & Header */}
-              <div className="text-center space-y-2">
-                <div className="mx-auto w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/25 mb-3">
-                  <BookOpen className="w-6 h-6" />
+      {/* Main Card */}
+      <main className="flex-1 flex items-center justify-center px-4 py-8">
+        <div className="w-full max-w-sm">
+          <div className="border border-border bg-card p-6 sm:p-7 rounded-xl shadow-xs space-y-5">
+            {/* Header */}
+            <div className="space-y-1 text-left">
+              <div className="w-8 h-8 rounded-md bg-secondary text-foreground flex items-center justify-center border border-border mb-3">
+                <NotebookPen className="w-4 h-4 text-primary" />
+              </div>
+              <h1 className="text-lg font-semibold tracking-tight text-foreground">
+                Sign in to Pages
+              </h1>
+              <p className="text-xs text-muted-foreground">
+                Enter your email and password to access your notebook.
+              </p>
+            </div>
+
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="space-y-3.5">
+              {error && (
+                <div className="p-2.5 rounded-md bg-destructive/10 border border-destructive/20 text-destructive text-xs leading-normal">
+                  {error}
                 </div>
-                <h1 className="text-2xl font-bold tracking-tight text-foreground">
-                  Sign in to your notebook
-                </h1>
-                <p className="text-xs text-muted-foreground">
-                  Access your personal knowledge base, notes, and shared pages
-                </p>
+              )}
+
+              <div className="space-y-1">
+                <label htmlFor="email" className="text-xs font-medium text-foreground block">
+                  Email
+                </label>
+                <div className="relative">
+                  <Mail className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-subtle-foreground" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="name@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    disabled={isLoading}
+                    className="pl-8 h-9 text-xs"
+                    autoComplete="email"
+                  />
+                </div>
               </div>
 
-              {/* Form */}
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {error && (
-                  <div className="p-3 rounded-xl bg-destructive/10 border border-destructive/30 text-destructive text-xs leading-relaxed animate-in fade-in duration-200">
-                    {error}
-                  </div>
+              <div className="space-y-1">
+                <label htmlFor="password" className="text-xs font-medium text-foreground block">
+                  Password
+                </label>
+                <div className="relative">
+                  <Lock className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-subtle-foreground" />
+                  <Input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    disabled={isLoading}
+                    className="pl-8 pr-8 h-9 text-xs"
+                    autoComplete="current-password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-subtle-foreground hover:text-foreground cursor-pointer"
+                    tabIndex={-1}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-3.5 h-3.5" />
+                    ) : (
+                      <Eye className="w-3.5 h-3.5" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              <Button
+                type="submit"
+                disabled={isLoading || !email || !password}
+                className="w-full h-9 text-xs font-medium mt-1"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin mr-1" />
+                    <span>Signing in...</span>
+                  </>
+                ) : (
+                  <span>Sign In</span>
                 )}
+              </Button>
+            </form>
 
-                <div className="space-y-1.5">
-                  <label htmlFor="email" className="text-xs font-semibold text-foreground/90 block">
-                    Email Address
-                  </label>
-                  <div className="relative">
-                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="you@example.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      disabled={isLoading}
-                      className="pl-10 h-11 text-sm bg-background/60"
-                      autoComplete="email"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <label htmlFor="password" className="text-xs font-semibold text-foreground/90 block">
-                      Password
-                    </label>
-                  </div>
-                  <div className="relative">
-                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input
-                      id="password"
-                      type={showPassword ? 'text' : 'password'}
-                      placeholder="Enter your password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                      disabled={isLoading}
-                      className="pl-10 pr-10 h-11 text-sm bg-background/60"
-                      autoComplete="current-password"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-0.5"
-                      tabIndex={-1}
-                    >
-                      {showPassword ? (
-                        <EyeOff className="w-4 h-4" />
-                      ) : (
-                        <Eye className="w-4 h-4" />
-                      )}
-                    </button>
-                  </div>
-                </div>
-
-                <Button
-                  type="submit"
-                  disabled={isLoading || !email || !password}
-                  variant="glow"
-                  className="w-full h-11 text-sm font-semibold rounded-xl gap-2 shadow-md shadow-primary/20 mt-2"
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span>Signing in...</span>
-                    </>
-                  ) : (
-                    <>
-                      <span>Sign In</span>
-                      <ArrowRight className="w-4 h-4" />
-                    </>
-                  )}
-                </Button>
-              </form>
-
-              {/* Bottom Switcher */}
-              <div className="pt-4 border-t border-border/60 text-center text-xs text-muted-foreground">
-                Don't have an account yet?{' '}
-                <Link
-                  href="/auth/signup"
-                  className="font-semibold text-primary hover:underline"
-                >
-                  Create account
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
+            {/* Bottom Switcher */}
+            <div className="pt-3 border-t border-border/60 text-center text-xs text-muted-foreground">
+              Don't have an account?{' '}
+              <Link
+                href="/auth/signup"
+                className="text-foreground hover:underline font-medium"
+              >
+                Create one
+              </Link>
+            </div>
+          </div>
         </div>
       </main>
 
       {/* Footer */}
-      <footer className="py-4 text-center text-[11px] text-muted-foreground z-20">
-        Personal-first knowledge notebook • Secure PostgreSQL
+      <footer className="py-4 text-center text-[11px] text-subtle-foreground">
+        Pages • Personal Knowledge System
       </footer>
     </div>
   )

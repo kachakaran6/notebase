@@ -4,34 +4,32 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-medium ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98] select-none cursor-pointer",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 select-none cursor-pointer",
   {
     variants: {
       variant: {
         default:
-          "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 hover:shadow-md hover:shadow-primary/20",
+          "bg-primary text-primary-foreground hover:bg-primary/90 shadow-xs",
         destructive:
-          "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90 hover:shadow-md hover:shadow-destructive/20",
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-xs",
         outline:
-          "border border-border/80 bg-background/60 backdrop-blur-sm hover:bg-accent hover:text-accent-foreground shadow-xs",
+          "border border-border bg-card text-foreground hover:bg-muted shadow-xs",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+          "bg-secondary text-secondary-foreground hover:bg-muted border border-border/60",
         ghost:
-          "hover:bg-accent/80 hover:text-accent-foreground",
+          "text-muted-foreground hover:text-foreground hover:bg-muted",
         link:
-          "text-primary underline-offset-4 hover:underline",
-        glow:
-          "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/25 hover:shadow-lg hover:shadow-blue-500/35 hover:brightness-105",
+          "text-primary underline-offset-4 hover:underline p-0 h-auto",
         subtle:
-          "bg-primary/10 text-primary hover:bg-primary/20",
+          "bg-muted text-foreground hover:bg-muted/80",
       },
       size: {
-        default: "h-9 px-4 py-2",
-        sm: "h-8 rounded-lg px-3 text-xs",
-        lg: "h-11 rounded-xl px-6 text-base",
-        icon: "h-9 w-9 p-0",
-        "icon-sm": "h-8 w-8 p-0 rounded-lg",
-        xs: "h-7 rounded-md px-2 text-[11px]",
+        default: "h-9 px-3.5 py-1.5 text-xs font-medium",
+        sm: "h-8 rounded-md px-2.5 text-xs",
+        lg: "h-10 rounded-lg px-4 text-sm font-medium",
+        icon: "h-8 w-8 p-0",
+        "icon-sm": "h-7 w-7 p-0 rounded-md",
+        xs: "h-6 rounded px-2 text-[11px]",
       },
     },
     defaultVariants: {

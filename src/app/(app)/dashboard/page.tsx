@@ -6,8 +6,13 @@ import Link from 'next/link'
 import {
   Plus,
   Search,
-  BookOpen,
-  Sparkles,
+  NotebookPen,
+  FileText,
+  FilePlus,
+  ListChecks,
+  Terminal,
+  FolderGit2,
+  FileCheck,
   Lock,
   Globe,
   Link as LinkIcon,
@@ -21,17 +26,14 @@ import {
   List as ListIcon,
   SlidersHorizontal,
   ChevronDown,
-  ArrowRight,
+  MoreHorizontal,
   ExternalLink,
-  MoreVertical,
-  FileText,
   User,
-  Zap,
+  X,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Badge } from '@/components/ui/badge'
-import { Card, CardContent } from '@/components/ui/card'
+import { Card } from '@/components/ui/card'
 import { ThemeToggle } from '@/components/theme-toggle'
 import {
   DropdownMenu,
@@ -63,66 +65,68 @@ import { Page, Template, Visibility } from '@/types/page'
 import { formatRelativeTime, stripHtml } from '@/lib/utils'
 import { toast } from 'sonner'
 
-const TEMPLATE_PRESETS: {
+interface TemplatePreset {
   id: Template
   label: string
-  icon: string
+  icon: typeof FileText
   description: string
   title: string
   content: string
-}[] = [
+}
+
+const TEMPLATE_PRESETS: TemplatePreset[] = [
   {
     id: 'blank',
     label: 'Blank Page',
-    icon: '📄',
-    description: 'Clean slate for anything',
+    icon: FilePlus,
+    description: 'Empty document',
     title: 'Untitled Page',
     content: '<p></p>',
   },
   {
     id: 'notes',
-    label: 'Meeting & Quick Notes',
-    icon: '📝',
-    description: 'Structure decisions & takeaways',
-    title: 'Meeting Notes & Next Steps',
+    label: 'Meeting Notes',
+    icon: NotebookPen,
+    description: 'Context, decisions, and action items',
+    title: 'Meeting Notes',
     content:
-      '<h2>🎯 Meeting Objective</h2><p>Brief summary of why we gathered.</p><h2>💡 Key Takeaways</h2><ul><li>Point 1: Major architectural decision</li><li>Point 2: Timeline alignment</li></ul><h2>✅ Action Items</h2><ul><li>[ ] Follow up with team by Friday</li><li>[ ] Deploy initial preview link</li></ul>',
+      '<h2>Objectives</h2><p>Brief summary of meeting purpose.</p><h2>Key Decisions</h2><ul><li>Decision 1</li><li>Decision 2</li></ul><h2>Action Items</h2><ul><li>Follow up on delivery timeline</li><li>Review technical documentation</li></ul>',
   },
   {
     id: 'checklist',
-    label: 'Deployment & Checklist',
-    icon: '☑️',
-    description: 'Interactive task tracker',
-    title: 'Production Deployment Checklist',
+    label: 'Checklist',
+    icon: ListChecks,
+    description: 'Track procedures and deliverables',
+    title: 'Project Checklist',
     content:
-      '<h2>🚀 Pre-Flight Verification</h2><ul><li>[ ] Database migrations applied</li><li>[ ] Environment secrets configured</li><li>[ ] SSL certificates verified</li></ul><h2>🔍 Smoke Testing</h2><ul><li>[ ] Test authentication flow</li><li>[ ] Validate public share links</li><li>[ ] Verify dark mode contrast</li></ul>',
+      '<h2>Tasks</h2><ul><li>Review system requirements</li><li>Verify database configuration</li><li>Test unlisted share links</li></ul>',
   },
   {
     id: 'prompt',
-    label: 'AI System Prompt',
-    icon: '🤖',
-    description: 'Optimized persona & instructions',
-    title: 'AI Architect System Prompt',
+    label: 'Prompt / Runbook',
+    icon: Terminal,
+    description: 'Structured commands and system prompts',
+    title: 'Technical Runbook',
     content:
-      '<h2>🧠 Persona & Context</h2><p>You are a Principal Software Architect specializing in modern fullstack TypeScript applications.</p><h2>🎯 Task Objectives</h2><p>Provide concise, production-ready code with clean typing and robust error handling.</p><h2>⚡ Constraints</h2><ul><li>Always prioritize speed and readability</li><li>Use pure SQL or typed ORM</li><li>Provide runnable solutions</li></ul>',
+      '<h2>Overview</h2><p>Operational instructions and persona guidelines.</p><h2>Commands</h2><pre><code># Run migration and verify tables\nnpm run build</code></pre><h2>Guidelines</h2><ul><li>Ensure type-safety</li><li>Verify error responses</li></ul>',
   },
   {
     id: 'project',
     label: 'Project Blueprint',
-    icon: '🚀',
-    description: 'Roadmap & deliverables',
-    title: 'Product Roadmap & Deliverables',
+    icon: FolderGit2,
+    description: 'Scope, timeline, and deliverables',
+    title: 'Project Roadmap',
     content:
-      '<h2>📌 Vision</h2><p>Build a personal-first notebook system with instant secret link sharing.</p><h2>🗺 Milestones</h2><ul><li>Phase 1: Database Schema & Authentication</li><li>Phase 2: Rich Tiptap Editor & Themes</li><li>Phase 3: Unlisted Share Tokens</li></ul><h2>📈 Success Metrics</h2><p>Sub-second page loads and zero sharing friction.</p>',
+      '<h2>Vision</h2><p>Document goals and architectural decisions.</p><h2>Deliverables</h2><ul><li>Core API integration</li><li>Editorial document canvas</li></ul>',
   },
   {
     id: 'meeting',
-    label: 'Design Decision Record',
-    icon: '📋',
-    description: 'Architecture trade-offs',
-    title: 'Architecture Decision Record (ADR)',
+    label: 'Decision Record',
+    icon: FileCheck,
+    description: 'Architecture and technical ADR',
+    title: 'Architecture Decision Record',
     content:
-      '<h2>Context</h2><p>Why do we need a personal-first page system over existing bloated tools?</p><h2>Decision</h2><p>Adopt PostgreSQL + Next.js + Drizzle ORM for full database ownership and clean unlisted sharing tokens.</p><h2>Consequences</h2><p>Zero lock-in, effortless deployments, and direct control over data.</p>',
+      '<h2>Context</h2><p>Problem description and requirements.</p><h2>Decision</h2><p>Chosen approach and architectural rationale.</p><h2>Consequences</h2><p>Positive trade-offs and considerations.</p>',
   },
 ]
 
@@ -170,7 +174,7 @@ export default function DashboardPage() {
       .catch(() => {})
   }, [])
 
-  // Keyboard shortcut Ctrl+K / Cmd+K for Command Palette
+  // Keyboard shortcut Ctrl+K / Cmd+K
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
@@ -185,7 +189,7 @@ export default function DashboardPage() {
   const handleSignOut = async () => {
     try {
       await fetch('/api/auth/signout', { method: 'POST' })
-      toast.success('Signed out successfully')
+      toast.success('Signed out')
       router.push('/auth/login')
       router.refresh()
     } catch (e) {
@@ -201,10 +205,8 @@ export default function DashboardPage() {
         title: preset.title,
         content: preset.content,
         template: preset.id,
-        icon: preset.icon,
         visibility: 'private',
       })
-      toast.success(`Created "${preset.title}"`)
       router.push(`/page/${newPage.id}`)
     } catch (err) {
       toast.error('Failed to create page')
@@ -217,19 +219,18 @@ export default function DashboardPage() {
 
     setQuickNoteSaving(true)
     try {
-      const title = quickNoteTitle.trim() || 'Untitled Quick Note'
+      const title = quickNoteTitle.trim() || 'Untitled Note'
       const content = `<p>${quickNoteContent.replace(/\n/g, '<br/>')}</p>`
       const newPage = await createPage({
         title,
         content,
         template: 'notes',
-        icon: '📝',
         visibility: 'private',
       })
       setQuickNoteTitle('')
       setQuickNoteContent('')
       setShowQuickNoteModal(false)
-      toast.success('Quick note saved!')
+      toast.success('Note saved')
       router.push(`/page/${newPage.id}`)
     } catch (err) {
       toast.error('Failed to save note')
@@ -250,7 +251,7 @@ export default function DashboardPage() {
     try {
       await navigator.clipboard.writeText(url)
       setCopiedId(page.id)
-      toast.success('Link copied to clipboard!')
+      toast.success('Link copied to clipboard')
       setTimeout(() => setCopiedId(null), 2000)
     } catch (err) {
       toast.error('Failed to copy link')
@@ -280,16 +281,6 @@ export default function DashboardPage() {
       setIsDeleting(false)
     }
   }
-
-  // Count stats
-  const counts = useMemo(() => {
-    return {
-      all: pages.length,
-      private: pages.filter((p) => p.visibility === 'private').length,
-      unlisted: pages.filter((p) => p.visibility === 'unlisted').length,
-      public: pages.filter((p) => p.visibility === 'public').length,
-    }
-  }, [pages])
 
   // Filtered and sorted pages
   const filteredPages = useMemo(() => {
@@ -323,111 +314,112 @@ export default function DashboardPage() {
   }, [pages, searchQuery, selectedFilter, sortBy])
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col selection:bg-primary/20 selection:text-primary">
-      {/* Top Navbar */}
-      <header className="border-b border-border/50 bg-background/80 backdrop-blur-xl sticky top-0 z-30 px-4 sm:px-8 py-3 flex items-center justify-between transition-colors">
-        <div className="flex items-center gap-3">
-          <Link href="/dashboard" className="flex items-center gap-2.5 group">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-purple-600 flex items-center justify-center text-white shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform">
-              <BookOpen className="w-4.5 h-4.5" />
+    <div className="min-h-screen bg-background text-foreground flex flex-col font-inter">
+      {/* Top Navigation Header */}
+      <header className="border-b border-border bg-card sticky top-0 z-30 px-6 lg:px-8 py-3 flex items-center justify-between">
+        {/* Left: App Logo & Name */}
+        <div className="flex items-center gap-2.5">
+          <Link href="/dashboard" className="flex items-center gap-2 text-foreground hover:opacity-85 transition">
+            <div className="w-7 h-7 rounded-md bg-secondary text-foreground flex items-center justify-center border border-border">
+              <NotebookPen className="w-4 h-4 text-primary" />
             </div>
-            <div>
-              <h1 className="text-base font-bold text-foreground tracking-tight leading-none group-hover:text-primary transition-colors">
-                Internet Notebook
-              </h1>
-              <span className="text-[11px] text-muted-foreground font-medium">
-                Personal Knowledge Base
-              </span>
-            </div>
+            <span className="text-sm font-semibold tracking-tight">
+              Pages
+            </span>
           </Link>
         </div>
 
-        <div className="flex items-center gap-2.5">
-          {/* Quick Capture Button */}
+        {/* Center: Search Field */}
+        <div className="hidden sm:flex items-center flex-1 max-w-sm mx-6">
+          <button
+            type="button"
+            onClick={() => setIsCommandOpen(true)}
+            className="w-full h-8 px-3 rounded-lg border border-border bg-background hover:bg-muted text-left text-xs text-muted-foreground flex items-center justify-between transition cursor-pointer"
+          >
+            <div className="flex items-center gap-2">
+              <Search className="w-3.5 h-3.5 text-subtle-foreground" />
+              <span>Search pages, notes, prompts...</span>
+            </div>
+            <kbd className="text-[10px] font-mono bg-card px-1.5 py-0.5 rounded border border-border text-subtle-foreground">
+              ⌘K
+            </kbd>
+          </button>
+        </div>
+
+        {/* Right: Actions */}
+        <div className="flex items-center gap-2">
+          {/* Quick Note Button */}
           <Button
             variant="outline"
             size="sm"
             onClick={() => setShowQuickNoteModal(true)}
-            className="text-xs font-semibold gap-1.5 hidden sm:inline-flex border-border/80"
+            className="text-xs font-medium gap-1.5"
           >
-            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
             <span>Quick Note</span>
-          </Button>
-
-          {/* Search trigger button */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setIsCommandOpen(true)}
-            className="text-xs text-muted-foreground gap-2 hidden md:inline-flex border-border/80 px-3"
-          >
-            <Search className="w-3.5 h-3.5 text-muted-foreground" />
-            <span>Search notebook...</span>
-            <kbd className="text-[10px] bg-muted px-1.5 py-0.5 rounded border border-border/60 font-mono text-muted-foreground">
-              Ctrl+K
-            </kbd>
           </Button>
 
           {/* New Page Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button size="sm" variant="glow" className="text-xs font-semibold gap-1.5 shadow-sm">
-                <Plus className="w-4 h-4" />
+              <Button size="sm" className="text-xs font-medium gap-1">
+                <Plus className="w-3.5 h-3.5" />
                 <span>New Page</span>
-                <ChevronDown className="w-3 h-3 opacity-80" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-64">
-              <DropdownMenuLabel>Choose Template</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              {TEMPLATE_PRESETS.map((tmpl) => (
-                <DropdownMenuItem
-                  key={tmpl.id}
-                  onClick={() => handleCreateWithTemplate(tmpl.id)}
-                  className="flex items-start gap-2.5 py-2"
-                >
-                  <span className="text-base">{tmpl.icon}</span>
-                  <div>
-                    <div className="font-semibold text-xs text-foreground">{tmpl.label}</div>
-                    <div className="text-[11px] text-muted-foreground">{tmpl.description}</div>
-                  </div>
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <div className="h-5 w-px bg-border/60 mx-1" />
-
-          {/* Theme Switcher */}
-          <ThemeToggle />
-
-          {/* User Profile Menu */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="rounded-xl h-9 w-9">
-                <div className="w-7 h-7 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold text-xs">
-                  {userEmail ? userEmail.charAt(0).toUpperCase() : 'U'}
-                </div>
+                <ChevronDown className="w-3 h-3 opacity-70 ml-0.5" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel className="font-normal">
-                <div className="flex flex-col space-y-1">
-                  <p className="text-xs font-bold leading-none text-foreground">Signed in as</p>
-                  <p className="text-[11px] leading-none text-muted-foreground font-mono truncate">
-                    {userEmail || 'Personal Account'}
-                  </p>
+              <DropdownMenuLabel>Create with template</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {TEMPLATE_PRESETS.map((tmpl) => {
+                const IconComponent = tmpl.icon
+                return (
+                  <DropdownMenuItem
+                    key={tmpl.id}
+                    onClick={() => handleCreateWithTemplate(tmpl.id)}
+                    className="flex items-start gap-2 py-2"
+                  >
+                    <IconComponent className="w-4 h-4 text-muted-foreground mt-0.5" />
+                    <div>
+                      <div className="font-medium text-xs text-foreground">{tmpl.label}</div>
+                      <div className="text-[11px] text-muted-foreground">{tmpl.description}</div>
+                    </div>
+                  </DropdownMenuItem>
+                )
+              })}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <div className="h-4 w-px bg-border mx-1" />
+
+          {/* Theme Toggle */}
+          <ThemeToggle />
+
+          {/* User Dropdown Menu */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                className="w-8 h-8 rounded-lg border border-border bg-card text-foreground hover:bg-muted flex items-center justify-center text-xs font-medium transition cursor-pointer"
+                title={userEmail || 'Account'}
+              >
+                {userEmail ? userEmail.charAt(0).toUpperCase() : <User className="w-3.5 h-3.5" />}
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-52">
+              <DropdownMenuLabel>
+                <div className="text-xs font-medium text-foreground truncate">
+                  {userEmail || 'My Account'}
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => setShowQuickNoteModal(true)}>
-                <Sparkles className="w-3.5 h-3.5 mr-2 text-amber-500" />
-                <span>Quick Note</span>
-                <span className="ml-auto text-[10px] font-mono text-muted-foreground">Ctrl+K</span>
+              <DropdownMenuItem onClick={() => setIsCommandOpen(true)}>
+                <Search className="w-3.5 h-3.5 mr-2 text-muted-foreground" />
+                <span>Command Menu</span>
+                <span className="ml-auto text-[10px] font-mono text-subtle-foreground">⌘K</span>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => handleCreateWithTemplate('blank')}>
-                <Plus className="w-3.5 h-3.5 mr-2" />
-                <span>New Blank Page</span>
+                <FilePlus className="w-3.5 h-3.5 mr-2 text-muted-foreground" />
+                <span>New Blank Document</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:text-destructive">
@@ -439,271 +431,260 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      {/* Main Container */}
-      <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-8 py-8">
-        {/* Controls Bar: Search, Filters, View Modes */}
-        <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-8">
-          {/* Search Input */}
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              type="text"
-              placeholder="Filter by title or note contents..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 h-10 text-sm bg-card/60 border-border/80 rounded-xl"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground text-xs"
-              >
-                Clear
-              </button>
-            )}
+      {/* Main Content Area */}
+      <main className="flex-1 max-w-[1280px] w-full mx-auto px-6 lg:px-8 py-8">
+        {/* Top Header Section */}
+        <div className="mb-6">
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-foreground mb-1">
+            Pages
+          </h1>
+          <p className="text-xs sm:text-sm text-secondary-foreground font-normal">
+            Create, organize and share your notes, prompts and ideas.
+          </p>
+        </div>
+
+        {/* Navigation Controls Bar */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 border-b border-border pb-2 mb-6">
+          {/* Tab Filtering (Clean underline style, no pills) */}
+          <div className="flex items-center gap-6 text-xs font-medium">
+            <button
+              onClick={() => setSelectedFilter('all')}
+              className={`pb-2 transition-colors border-b-2 -mb-[9px] cursor-pointer ${
+                selectedFilter === 'all'
+                  ? 'border-primary text-foreground font-semibold'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              All
+            </button>
+            <button
+              onClick={() => setSelectedFilter('private')}
+              className={`pb-2 transition-colors border-b-2 -mb-[9px] cursor-pointer flex items-center gap-1.5 ${
+                selectedFilter === 'private'
+                  ? 'border-primary text-foreground font-semibold'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <Lock className="w-3 h-3 text-muted-foreground" />
+              <span>Private</span>
+            </button>
+            <button
+              onClick={() => setSelectedFilter('unlisted')}
+              className={`pb-2 transition-colors border-b-2 -mb-[9px] cursor-pointer flex items-center gap-1.5 ${
+                selectedFilter === 'unlisted'
+                  ? 'border-primary text-foreground font-semibold'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <LinkIcon className="w-3 h-3 text-muted-foreground" />
+              <span>Shared</span>
+            </button>
+            <button
+              onClick={() => setSelectedFilter('public')}
+              className={`pb-2 transition-colors border-b-2 -mb-[9px] cursor-pointer flex items-center gap-1.5 ${
+                selectedFilter === 'public'
+                  ? 'border-primary text-foreground font-semibold'
+                  : 'border-transparent text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <Globe className="w-3 h-3 text-muted-foreground" />
+              <span>Public</span>
+            </button>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2.5">
-            {/* Visibility Filter Tabs */}
-            <div className="flex items-center bg-muted/60 p-1 rounded-xl border border-border/50 text-xs">
-              <button
-                onClick={() => setSelectedFilter('all')}
-                className={`px-3 py-1.5 rounded-lg font-semibold transition ${
-                  selectedFilter === 'all'
-                    ? 'bg-background text-foreground shadow-xs'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                All ({counts.all})
-              </button>
-              <button
-                onClick={() => setSelectedFilter('private')}
-                className={`px-3 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition ${
-                  selectedFilter === 'private'
-                    ? 'bg-background text-foreground shadow-xs'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                <Lock className="w-3 h-3 text-muted-foreground" />
-                Private ({counts.private})
-              </button>
-              <button
-                onClick={() => setSelectedFilter('unlisted')}
-                className={`px-3 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition ${
-                  selectedFilter === 'unlisted'
-                    ? 'bg-background text-foreground shadow-xs'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                <LinkIcon className="w-3 h-3 text-amber-500" />
-                Shared ({counts.unlisted})
-              </button>
-              <button
-                onClick={() => setSelectedFilter('public')}
-                className={`px-3 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition ${
-                  selectedFilter === 'public'
-                    ? 'bg-background text-foreground shadow-xs'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                <Globe className="w-3 h-3 text-emerald-500" />
-                Public ({counts.public})
-              </button>
-            </div>
-
+          {/* Right Controls: Sort & Layout Toggle */}
+          <div className="flex items-center gap-2 pb-1">
             {/* Sort Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="h-9 text-xs gap-1.5 border-border/70">
-                  <SlidersHorizontal className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Sort</span>
+                <Button variant="ghost" size="sm" className="h-7 text-xs text-muted-foreground gap-1 px-2 font-normal">
+                  <SlidersHorizontal className="w-3 h-3" />
+                  <span>Sort</span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-44">
-                <DropdownMenuLabel>Sort Pages By</DropdownMenuLabel>
+              <DropdownMenuContent align="end" className="w-40">
+                <DropdownMenuLabel>Sort by</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => setSortBy('updated')}>
-                  <Clock className="w-3.5 h-3.5 mr-2 text-muted-foreground" />
                   <span>Recently Updated</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setSortBy('created')}>
-                  <Sparkles className="w-3.5 h-3.5 mr-2 text-muted-foreground" />
                   <span>Date Created</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => setSortBy('alphabetical')}>
-                  <FileText className="w-3.5 h-3.5 mr-2 text-muted-foreground" />
                   <span>Title (A-Z)</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
             {/* View Mode Toggle */}
-            <div className="flex items-center bg-muted/60 p-0.5 rounded-xl border border-border/50">
+            <div className="flex items-center border border-border rounded-md bg-card p-0.5">
               <button
                 onClick={() => setViewMode('grid')}
-                className={`p-1.5 rounded-lg transition ${
+                className={`p-1 rounded transition cursor-pointer ${
                   viewMode === 'grid'
-                    ? 'bg-background text-foreground shadow-xs'
+                    ? 'bg-muted text-foreground'
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
-                title="Grid View"
+                title="Grid view"
               >
-                <LayoutGrid className="w-4 h-4" />
+                <LayoutGrid className="w-3.5 h-3.5" />
               </button>
               <button
                 onClick={() => setViewMode('list')}
-                className={`p-1.5 rounded-lg transition ${
+                className={`p-1 rounded transition cursor-pointer ${
                   viewMode === 'list'
-                    ? 'bg-background text-foreground shadow-xs'
+                    ? 'bg-muted text-foreground'
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
-                title="List View"
+                title="List view"
               >
-                <ListIcon className="w-4 h-4" />
+                <ListIcon className="w-3.5 h-3.5" />
               </button>
             </div>
           </div>
         </div>
 
-        {/* Content Area */}
+        {/* Content Section */}
         {loading ? (
-          <div className="py-28 flex flex-col items-center justify-center">
-            <div className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin mb-4" />
-            <p className="text-xs text-muted-foreground">Loading your notebook pages...</p>
+          <div className="py-24 flex flex-col items-center justify-center text-muted-foreground">
+            <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin mb-3" />
+            <p className="text-xs">Loading pages...</p>
           </div>
         ) : filteredPages.length === 0 ? (
-          <div className="text-center py-20 px-6 border border-dashed border-border/80 rounded-3xl bg-card/30 backdrop-blur-sm">
-            <div className="w-14 h-14 mx-auto mb-4 bg-primary/10 text-primary rounded-2xl flex items-center justify-center text-2xl shadow-xs">
-              📝
+          /* Empty State (Clean & Minimal, no emoji, compact buttons) */
+          <div className="py-16 text-center max-w-md mx-auto">
+            <div className="w-10 h-10 mx-auto mb-3 rounded-lg border border-border bg-card flex items-center justify-center text-muted-foreground">
+              <FileText className="w-5 h-5 text-muted-foreground" />
             </div>
-            <h3 className="text-lg font-bold text-foreground mb-1">
-              {searchQuery ? 'No matching pages found' : 'No notebook pages yet'}
+            <h3 className="text-sm font-semibold text-foreground mb-1">
+              {searchQuery ? 'No matching pages' : 'No pages yet'}
             </h3>
-            <p className="text-xs text-muted-foreground max-w-sm mx-auto mb-6 leading-relaxed">
+            <p className="text-xs text-muted-foreground mb-6 leading-relaxed">
               {searchQuery
-                ? 'Try searching for a different keyword or reset the visibility filter.'
-                : 'Start your personal notebook by creating a blank page or choosing a structured template below.'}
+                ? 'Try a different search keyword or clear the active filter.'
+                : 'Create your first page or start with a template.'}
             </p>
-            <div className="flex flex-wrap items-center justify-center gap-2.5">
-              {TEMPLATE_PRESETS.slice(0, 4).map((tmpl) => (
-                <Button
-                  key={tmpl.id}
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleCreateWithTemplate(tmpl.id)}
-                  className="text-xs gap-2 border-border/80"
-                >
-                  <span>{tmpl.icon}</span>
-                  <span>{tmpl.label}</span>
-                </Button>
-              ))}
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              {TEMPLATE_PRESETS.slice(0, 4).map((tmpl) => {
+                const IconComp = tmpl.icon
+                return (
+                  <Button
+                    key={tmpl.id}
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleCreateWithTemplate(tmpl.id)}
+                    className="text-xs gap-1.5"
+                  >
+                    <IconComp className="w-3.5 h-3.5 text-muted-foreground" />
+                    <span>{tmpl.label}</span>
+                  </Button>
+                )
+              })}
             </div>
           </div>
         ) : viewMode === 'grid' ? (
-          /* Grid View */
+          /* 3-Column Desktop Grid of Document Cards */
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredPages.map((page) => {
               const isPublic = page.visibility === 'public'
               const isUnlisted = page.visibility === 'unlisted'
-              const snippet = page.content ? stripHtml(page.content) : 'No content on this page yet...'
+              const snippet = page.content
+                ? stripHtml(page.content)
+                : 'No content on this page.'
 
               return (
-                <Card
+                <div
                   key={page.id}
                   onClick={() => router.push(`/page/${page.id}`)}
-                  className="group relative cursor-pointer interactive-card flex flex-col justify-between p-5 border-border/70 bg-card/80 backdrop-blur-sm hover:border-primary/50"
+                  className="doc-card group relative p-4 rounded-xl border border-border bg-card cursor-pointer flex flex-col justify-between hover:bg-card/90"
                 >
                   <div>
-                    {/* Top Row: Icon & Visibility Badge */}
-                    <div className="flex items-center justify-between mb-3.5">
-                      <div className="text-2xl select-none w-10 h-10 rounded-xl bg-background/80 flex items-center justify-center border border-border/60 shadow-xs group-hover:scale-105 transition-transform">
-                        {page.icon || '📄'}
+                    {/* Top row: Icon + Title + More menu */}
+                    <div className="flex items-start justify-between gap-2 mb-2">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <FileText className="w-4 h-4 text-muted-foreground shrink-0" />
+                        <h3 className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors truncate">
+                          {page.title || 'Untitled'}
+                        </h3>
                       </div>
-                      <Badge
-                        variant={isPublic ? 'success' : isUnlisted ? 'warning' : 'outline'}
-                        className="text-[11px] font-medium"
-                      >
-                        {isPublic ? (
-                          <>
-                            <Globe className="w-3 h-3" /> Public
-                          </>
-                        ) : isUnlisted ? (
-                          <>
-                            <LinkIcon className="w-3 h-3" /> Shared Link
-                          </>
-                        ) : (
-                          <>
-                            <Lock className="w-3 h-3" /> Private
-                          </>
-                        )}
-                      </Badge>
+
+                      <div onClick={(e) => e.stopPropagation()}>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button
+                              type="button"
+                              className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted transition cursor-pointer"
+                              title="More actions"
+                            >
+                              <MoreHorizontal className="w-3.5 h-3.5" />
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-40">
+                            <DropdownMenuItem onClick={(e) => handleCopyLink(page, e)}>
+                              <Copy className="w-3.5 h-3.5 mr-2 text-muted-foreground" />
+                              <span>Copy link</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={(e) => handleDuplicate(page.id, e)}>
+                              <FolderPlus className="w-3.5 h-3.5 mr-2 text-muted-foreground" />
+                              <span>Duplicate</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                setPageToDelete(page)
+                              }}
+                              className="text-destructive focus:text-destructive"
+                            >
+                              <Trash2 className="w-3.5 h-3.5 mr-2" />
+                              <span>Delete</span>
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
                     </div>
 
-                    {/* Title */}
-                    <h3 className="font-bold text-foreground text-base mb-1.5 line-clamp-1 group-hover:text-primary transition-colors">
-                      {page.title || 'Untitled Page'}
-                    </h3>
-
-                    {/* Content Preview */}
+                    {/* Middle preview */}
                     <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed mb-4">
-                      {snippet || 'Empty note...'}
+                      {snippet}
                     </p>
                   </div>
 
-                  {/* Bottom Meta & Actions */}
-                  <div className="pt-3.5 border-t border-border/40 flex items-center justify-between text-[11px] text-muted-foreground">
-                    <div className="flex items-center gap-1.5 font-medium">
-                      <Clock className="w-3 h-3" />
+                  {/* Bottom metadata (Plain text + Lucide icon, NO badges/pills) */}
+                  <div className="pt-3 border-t border-border/50 flex items-center justify-between text-[11px] text-muted-foreground">
+                    <div className="flex items-center gap-1">
+                      <Clock className="w-3 h-3 text-subtle-foreground" />
                       <span>{formatRelativeTime(page.updatedAt)}</span>
                     </div>
 
-                    <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                      <Button
-                        variant="ghost"
-                        size="icon-sm"
-                        onClick={(e) => handleCopyLink(page, e)}
-                        title="Copy Page Link"
-                        className="text-muted-foreground hover:text-foreground"
-                      >
-                        {copiedId === page.id ? (
-                          <Check className="w-3.5 h-3.5 text-emerald-500" />
-                        ) : (
-                          <Copy className="w-3.5 h-3.5" />
-                        )}
-                      </Button>
-
-                      <Button
-                        variant="ghost"
-                        size="icon-sm"
-                        onClick={(e) => handleDuplicate(page.id, e)}
-                        title="Duplicate Page"
-                        className="text-muted-foreground hover:text-foreground"
-                      >
-                        <FolderPlus className="w-3.5 h-3.5" />
-                      </Button>
-
-                      <Button
-                        variant="ghost"
-                        size="icon-sm"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          setPageToDelete(page)
-                        }}
-                        title="Delete Page"
-                        className="text-muted-foreground hover:text-destructive"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </Button>
+                    <div className="flex items-center gap-1 text-muted-foreground">
+                      {isPublic ? (
+                        <>
+                          <Globe className="w-3 h-3 text-muted-foreground" />
+                          <span>Public</span>
+                        </>
+                      ) : isUnlisted ? (
+                        <>
+                          <LinkIcon className="w-3 h-3 text-muted-foreground" />
+                          <span>Shared</span>
+                        </>
+                      ) : (
+                        <>
+                          <Lock className="w-3 h-3 text-subtle-foreground" />
+                          <span>Private</span>
+                        </>
+                      )}
                     </div>
                   </div>
-                </Card>
+                </div>
               )
             })}
           </div>
         ) : (
-          /* List View Table */
-          <div className="rounded-2xl border border-border/70 bg-card/80 overflow-hidden backdrop-blur-sm">
-            <div className="divide-y divide-border/40">
+          /* List View */
+          <div className="rounded-xl border border-border bg-card overflow-hidden">
+            <div className="divide-y divide-border/60">
               {filteredPages.map((page) => {
                 const isPublic = page.visibility === 'public'
                 const isUnlisted = page.visibility === 'unlisted'
@@ -712,62 +693,63 @@ export default function DashboardPage() {
                   <div
                     key={page.id}
                     onClick={() => router.push(`/page/${page.id}`)}
-                    className="p-4 flex items-center justify-between hover:bg-muted/40 cursor-pointer transition-colors group"
+                    className="p-3.5 flex items-center justify-between hover:bg-muted/40 cursor-pointer transition-colors group"
                   >
-                    <div className="flex items-center gap-3.5 min-w-0">
-                      <span className="text-xl flex-shrink-0">{page.icon || '📄'}</span>
+                    <div className="flex items-center gap-3 min-w-0">
+                      <FileText className="w-4 h-4 text-muted-foreground shrink-0" />
                       <div className="min-w-0">
-                        <h4 className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors truncate">
-                          {page.title || 'Untitled Page'}
+                        <h4 className="font-semibold text-xs text-foreground group-hover:text-primary transition-colors truncate">
+                          {page.title || 'Untitled'}
                         </h4>
-                        <span className="text-[11px] text-muted-foreground">
-                          Updated {formatRelativeTime(page.updatedAt)}
-                        </span>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-3 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
-                      <Badge
-                        variant={isPublic ? 'success' : isUnlisted ? 'warning' : 'outline'}
-                        className="text-[10px] hidden sm:inline-flex"
-                      >
-                        {isPublic ? 'Public' : isUnlisted ? 'Shared' : 'Private'}
-                      </Badge>
+                    <div className="flex items-center gap-4 text-xs text-muted-foreground shrink-0" onClick={(e) => e.stopPropagation()}>
+                      <span className="text-[11px] text-subtle-foreground hidden sm:inline">
+                        {formatRelativeTime(page.updatedAt)}
+                      </span>
 
-                      <Button
-                        variant="ghost"
-                        size="icon-sm"
+                      <div className="flex items-center gap-1 text-[11px]">
+                        {isPublic ? (
+                          <>
+                            <Globe className="w-3 h-3 text-muted-foreground" />
+                            <span className="hidden sm:inline">Public</span>
+                          </>
+                        ) : isUnlisted ? (
+                          <>
+                            <LinkIcon className="w-3 h-3 text-muted-foreground" />
+                            <span className="hidden sm:inline">Shared</span>
+                          </>
+                        ) : (
+                          <>
+                            <Lock className="w-3 h-3 text-subtle-foreground" />
+                            <span className="hidden sm:inline">Private</span>
+                          </>
+                        )}
+                      </div>
+
+                      <button
                         onClick={(e) => handleCopyLink(page, e)}
                         title="Copy Link"
+                        className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted transition cursor-pointer"
                       >
                         {copiedId === page.id ? (
-                          <Check className="w-3.5 h-3.5 text-emerald-500" />
+                          <Check className="w-3.5 h-3.5 text-success" />
                         ) : (
                           <Copy className="w-3.5 h-3.5" />
                         )}
-                      </Button>
+                      </button>
 
-                      <Button
-                        variant="ghost"
-                        size="icon-sm"
-                        onClick={(e) => handleDuplicate(page.id, e)}
-                        title="Duplicate"
-                      >
-                        <FolderPlus className="w-3.5 h-3.5" />
-                      </Button>
-
-                      <Button
-                        variant="ghost"
-                        size="icon-sm"
+                      <button
                         onClick={(e) => {
                           e.stopPropagation()
                           setPageToDelete(page)
                         }}
                         title="Delete"
-                        className="hover:text-destructive"
+                        className="p-1 rounded text-muted-foreground hover:text-destructive hover:bg-muted transition cursor-pointer"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
-                      </Button>
+                      </button>
                     </div>
                   </div>
                 )
@@ -777,11 +759,11 @@ export default function DashboardPage() {
         )}
       </main>
 
-      {/* Command Palette (Ctrl+K) */}
+      {/* Command Palette Modal (Ctrl+K / Cmd+K) */}
       <CommandDialog open={isCommandOpen} onOpenChange={setIsCommandOpen}>
-        <CommandInput placeholder="Type a command or search pages..." />
+        <CommandInput placeholder="Search documents or run action..." />
         <CommandList>
-          <CommandEmpty>No matching pages found.</CommandEmpty>
+          <CommandEmpty>No results found.</CommandEmpty>
           <CommandGroup heading="Actions">
             <CommandItem
               onSelect={() => {
@@ -789,9 +771,9 @@ export default function DashboardPage() {
                 setShowQuickNoteModal(true)
               }}
             >
-              <Sparkles className="w-4 h-4 text-amber-500" />
+              <NotebookPen className="w-4 h-4 text-muted-foreground" />
               <span>Capture Quick Note</span>
-              <CommandShortcut>Ctrl+K</CommandShortcut>
+              <CommandShortcut>⌘K</CommandShortcut>
             </CommandItem>
             <CommandItem
               onSelect={() => {
@@ -799,27 +781,30 @@ export default function DashboardPage() {
                 handleCreateWithTemplate('blank')
               }}
             >
-              <Plus className="w-4 h-4" />
-              <span>Create Blank Page</span>
+              <FilePlus className="w-4 h-4 text-muted-foreground" />
+              <span>Create Blank Document</span>
             </CommandItem>
           </CommandGroup>
 
           <CommandGroup heading="Templates">
-            {TEMPLATE_PRESETS.map((tmpl) => (
-              <CommandItem
-                key={tmpl.id}
-                onSelect={() => {
-                  setIsCommandOpen(false)
-                  handleCreateWithTemplate(tmpl.id)
-                }}
-              >
-                <span className="text-base mr-1">{tmpl.icon}</span>
-                <span>{tmpl.label}</span>
-              </CommandItem>
-            ))}
+            {TEMPLATE_PRESETS.map((tmpl) => {
+              const IconComponent = tmpl.icon
+              return (
+                <CommandItem
+                  key={tmpl.id}
+                  onSelect={() => {
+                    setIsCommandOpen(false)
+                    handleCreateWithTemplate(tmpl.id)
+                  }}
+                >
+                  <IconComponent className="w-4 h-4 text-muted-foreground" />
+                  <span>{tmpl.label}</span>
+                </CommandItem>
+              )
+            })}
           </CommandGroup>
 
-          <CommandGroup heading="Notebook Pages">
+          <CommandGroup heading="Documents">
             {pages.map((p) => (
               <CommandItem
                 key={p.id}
@@ -828,8 +813,8 @@ export default function DashboardPage() {
                   router.push(`/page/${p.id}`)
                 }}
               >
-                <span className="mr-1">{p.icon || '📄'}</span>
-                <span>{p.title || 'Untitled Page'}</span>
+                <FileText className="w-4 h-4 text-muted-foreground" />
+                <span>{p.title || 'Untitled'}</span>
                 <CommandShortcut>{formatRelativeTime(p.updatedAt)}</CommandShortcut>
               </CommandItem>
             ))}
@@ -837,37 +822,33 @@ export default function DashboardPage() {
         </CommandList>
       </CommandDialog>
 
-      {/* Floating Quick Capture Dialog */}
+      {/* Quick Note Capture Dialog */}
       <Dialog open={showQuickNoteModal} onOpenChange={setShowQuickNoteModal}>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <div className="flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-amber-500" />
-              <DialogTitle>Quick Note</DialogTitle>
-            </div>
+            <DialogTitle>Quick Note</DialogTitle>
             <DialogDescription>
-              Capture snippets, AI prompts, or server runbooks instantly.
+              Capture notes, commands, or thoughts instantly.
             </DialogDescription>
           </DialogHeader>
 
-          <form onSubmit={handleSaveQuickNote} className="space-y-4 pt-2">
+          <form onSubmit={handleSaveQuickNote} className="space-y-3 pt-1">
             <div>
               <Input
-                placeholder="Note title (optional)"
+                placeholder="Title (optional)"
                 value={quickNoteTitle}
                 onChange={(e) => setQuickNoteTitle(e.target.value)}
                 autoFocus
-                className="bg-background/80 font-medium"
               />
             </div>
 
             <div>
               <textarea
                 rows={5}
-                placeholder="Write anything... Paste links, code blocks, checklists, or prompts..."
+                placeholder="Write anything..."
                 value={quickNoteContent}
                 onChange={(e) => setQuickNoteContent(e.target.value)}
-                className="w-full rounded-xl bg-background/80 border border-input px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent leading-relaxed"
+                className="w-full rounded-lg border border-border bg-card px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring leading-relaxed"
               />
             </div>
 
@@ -882,12 +863,10 @@ export default function DashboardPage() {
               </Button>
               <Button
                 type="submit"
-                variant="glow"
                 size="sm"
                 disabled={quickNoteSaving || (!quickNoteTitle.trim() && !quickNoteContent.trim())}
-                className="font-semibold"
               >
-                {quickNoteSaving ? 'Saving...' : 'Save & Open Note'}
+                {quickNoteSaving ? 'Saving...' : 'Save Note'}
               </Button>
             </DialogFooter>
           </form>
@@ -896,13 +875,11 @@ export default function DashboardPage() {
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={!!pageToDelete} onOpenChange={(open) => !open && setPageToDelete(null)}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-sm">
           <DialogHeader>
-            <DialogTitle>Delete Page</DialogTitle>
+            <DialogTitle>Delete Document</DialogTitle>
             <DialogDescription>
-              Are you sure you want to permanently delete{' '}
-              <strong className="text-foreground">"{pageToDelete?.title || 'this page'}"</strong>?
-              This action cannot be undone.
+              Are you sure you want to delete <strong className="text-foreground">"{pageToDelete?.title || 'Untitled'}"</strong>? This cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -920,7 +897,7 @@ export default function DashboardPage() {
               onClick={confirmDelete}
               disabled={isDeleting}
             >
-              {isDeleting ? 'Deleting...' : 'Delete Permanently'}
+              {isDeleting ? 'Deleting...' : 'Delete'}
             </Button>
           </DialogFooter>
         </DialogContent>

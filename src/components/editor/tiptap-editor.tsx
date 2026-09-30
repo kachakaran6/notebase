@@ -26,7 +26,6 @@ import {
   Redo2,
   Pilcrow,
   Check,
-  AlignLeft,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -41,7 +40,6 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { Input } from '@/components/ui/input'
-import { Separator } from '@/components/ui/separator'
 
 interface TiptapEditorProps {
   content: string
@@ -68,7 +66,7 @@ export default function TiptapEditor({
       TextStyle,
       Color,
       Highlight.configure({
-        multicolor: true,
+        multicolor: false,
       }),
       Link.configure({
         openOnClick: false,
@@ -86,7 +84,7 @@ export default function TiptapEditor({
     editorProps: {
       attributes: {
         class:
-          'ProseMirror min-h-[420px] p-6 sm:p-8 focus:outline-none text-foreground leading-relaxed text-base font-sans selection:bg-primary/20',
+          'ProseMirror min-h-[420px] p-6 sm:p-8 focus:outline-none text-foreground leading-relaxed text-sm sm:text-base font-inter selection:bg-primary/20',
       },
     },
     immediatelyRender: false,
@@ -139,13 +137,12 @@ export default function TiptapEditor({
   if (!editor) {
     return (
       <div className="min-h-[350px] flex flex-col items-center justify-center text-muted-foreground">
-        <div className="w-7 h-7 border-2 border-primary border-t-transparent rounded-full animate-spin mb-3" />
-        <span className="text-xs">Initializing canvas...</span>
+        <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin mb-2" />
+        <span className="text-xs">Loading editor...</span>
       </div>
     )
   }
 
-  // Active block format label
   const currentBlockLabel = editor.isActive('heading', { level: 1 })
     ? 'Heading 1'
     : editor.isActive('heading', { level: 2 })
@@ -155,18 +152,18 @@ export default function TiptapEditor({
     : 'Text'
 
   return (
-    <div className="w-full flex flex-col rounded-2xl border border-border/70 bg-card/85 backdrop-blur-xl shadow-sm overflow-hidden transition-colors">
-      {/* Sticky Formatting Toolbar */}
+    <div className="w-full flex flex-col rounded-xl border border-border bg-card shadow-xs overflow-hidden transition-colors">
+      {/* Editorial Formatting Toolbar */}
       {editable && (
-        <div className="sticky top-0 z-20 border-b border-border/60 bg-muted/40 backdrop-blur-md px-3 py-2 flex flex-wrap items-center gap-1 text-muted-foreground select-none">
+        <div className="border-b border-border bg-surface-secondary px-3 py-1.5 flex flex-wrap items-center gap-1 text-muted-foreground select-none">
           {/* Undo / Redo */}
           <div className="flex items-center">
             <button
               type="button"
               onClick={() => editor.chain().focus().undo().run()}
               disabled={!editor.can().undo()}
-              className="p-1.5 rounded-lg hover:bg-accent hover:text-accent-foreground disabled:opacity-30 disabled:hover:bg-transparent transition cursor-pointer"
-              title="Undo (Ctrl+Z)"
+              className="p-1.5 rounded-md hover:bg-muted hover:text-foreground disabled:opacity-30 transition cursor-pointer"
+              title="Undo"
             >
               <Undo2 className="w-3.5 h-3.5" />
             </button>
@@ -174,32 +171,32 @@ export default function TiptapEditor({
               type="button"
               onClick={() => editor.chain().focus().redo().run()}
               disabled={!editor.can().redo()}
-              className="p-1.5 rounded-lg hover:bg-accent hover:text-accent-foreground disabled:opacity-30 disabled:hover:bg-transparent transition cursor-pointer"
-              title="Redo (Ctrl+Y)"
+              className="p-1.5 rounded-md hover:bg-muted hover:text-foreground disabled:opacity-30 transition cursor-pointer"
+              title="Redo"
             >
               <Redo2 className="w-3.5 h-3.5" />
             </button>
           </div>
 
-          <div className="w-px h-4 bg-border/80 mx-1" />
+          <div className="w-px h-3.5 bg-border mx-1" />
 
-          {/* Heading / Block Style Dropdown */}
+          {/* Heading Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
                 type="button"
-                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold hover:bg-accent hover:text-accent-foreground transition text-foreground"
+                className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium hover:bg-muted text-foreground transition cursor-pointer"
               >
                 <span>{currentBlockLabel}</span>
-                <Pilcrow className="w-3 h-3 text-muted-foreground" />
+                <Pilcrow className="w-3 h-3 text-muted-foreground opacity-60" />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-40">
+            <DropdownMenuContent align="start" className="w-36">
               <DropdownMenuItem
                 onClick={() => editor.chain().focus().setParagraph().run()}
-                className={editor.isActive('paragraph') ? 'bg-accent font-bold' : ''}
+                className={editor.isActive('paragraph') ? 'font-semibold bg-muted' : ''}
               >
-                <Pilcrow className="w-3.5 h-3.5 mr-2" />
+                <Pilcrow className="w-3.5 h-3.5 mr-2 text-muted-foreground" />
                 <span>Text</span>
               </DropdownMenuItem>
               <DropdownMenuItem
@@ -208,11 +205,11 @@ export default function TiptapEditor({
                 }
                 className={
                   editor.isActive('heading', { level: 1 })
-                    ? 'bg-accent font-bold'
+                    ? 'font-semibold bg-muted'
                     : ''
                 }
               >
-                <Heading1 className="w-3.5 h-3.5 mr-2" />
+                <Heading1 className="w-3.5 h-3.5 mr-2 text-muted-foreground" />
                 <span>Heading 1</span>
               </DropdownMenuItem>
               <DropdownMenuItem
@@ -221,11 +218,11 @@ export default function TiptapEditor({
                 }
                 className={
                   editor.isActive('heading', { level: 2 })
-                    ? 'bg-accent font-bold'
+                    ? 'font-semibold bg-muted'
                     : ''
                 }
               >
-                <Heading2 className="w-3.5 h-3.5 mr-2" />
+                <Heading2 className="w-3.5 h-3.5 mr-2 text-muted-foreground" />
                 <span>Heading 2</span>
               </DropdownMenuItem>
               <DropdownMenuItem
@@ -234,51 +231,51 @@ export default function TiptapEditor({
                 }
                 className={
                   editor.isActive('heading', { level: 3 })
-                    ? 'bg-accent font-bold'
+                    ? 'font-semibold bg-muted'
                     : ''
                 }
               >
-                <Heading3 className="w-3.5 h-3.5 mr-2" />
+                <Heading3 className="w-3.5 h-3.5 mr-2 text-muted-foreground" />
                 <span>Heading 3</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <div className="w-px h-4 bg-border/80 mx-1" />
+          <div className="w-px h-3.5 bg-border mx-1" />
 
-          {/* Inline Text Styles */}
+          {/* Inline Formats */}
           <div className="flex items-center gap-0.5">
             <button
               type="button"
               onClick={() => editor.chain().focus().toggleBold().run()}
-              className={`p-1.5 rounded-lg transition cursor-pointer ${
+              className={`p-1.5 rounded-md transition cursor-pointer ${
                 editor.isActive('bold')
-                  ? 'bg-primary/15 text-primary font-bold shadow-xs'
-                  : 'hover:bg-accent hover:text-accent-foreground'
+                  ? 'bg-muted text-foreground font-semibold'
+                  : 'hover:bg-muted hover:text-foreground'
               }`}
-              title="Bold (Ctrl+B)"
+              title="Bold"
             >
               <Bold className="w-3.5 h-3.5" />
             </button>
             <button
               type="button"
               onClick={() => editor.chain().focus().toggleItalic().run()}
-              className={`p-1.5 rounded-lg transition cursor-pointer ${
+              className={`p-1.5 rounded-md transition cursor-pointer ${
                 editor.isActive('italic')
-                  ? 'bg-primary/15 text-primary font-bold shadow-xs'
-                  : 'hover:bg-accent hover:text-accent-foreground'
+                  ? 'bg-muted text-foreground font-semibold'
+                  : 'hover:bg-muted hover:text-foreground'
               }`}
-              title="Italic (Ctrl+I)"
+              title="Italic"
             >
               <Italic className="w-3.5 h-3.5" />
             </button>
             <button
               type="button"
               onClick={() => editor.chain().focus().toggleStrike().run()}
-              className={`p-1.5 rounded-lg transition cursor-pointer ${
+              className={`p-1.5 rounded-md transition cursor-pointer ${
                 editor.isActive('strike')
-                  ? 'bg-primary/15 text-primary font-bold shadow-xs'
-                  : 'hover:bg-accent hover:text-accent-foreground'
+                  ? 'bg-muted text-foreground font-semibold'
+                  : 'hover:bg-muted hover:text-foreground'
               }`}
               title="Strikethrough"
             >
@@ -287,22 +284,22 @@ export default function TiptapEditor({
             <button
               type="button"
               onClick={() => editor.chain().focus().toggleHighlight().run()}
-              className={`p-1.5 rounded-lg transition cursor-pointer ${
+              className={`p-1.5 rounded-md transition cursor-pointer ${
                 editor.isActive('highlight')
-                  ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400 font-bold shadow-xs'
-                  : 'hover:bg-accent hover:text-accent-foreground'
+                  ? 'bg-muted text-foreground font-semibold'
+                  : 'hover:bg-muted hover:text-foreground'
               }`}
-              title="Highlight text"
+              title="Highlight"
             >
               <Highlighter className="w-3.5 h-3.5" />
             </button>
             <button
               type="button"
               onClick={() => editor.chain().focus().toggleCode().run()}
-              className={`p-1.5 rounded-lg transition cursor-pointer ${
+              className={`p-1.5 rounded-md transition cursor-pointer ${
                 editor.isActive('code')
-                  ? 'bg-primary/15 text-primary font-mono shadow-xs'
-                  : 'hover:bg-accent hover:text-accent-foreground'
+                  ? 'bg-muted text-foreground font-semibold'
+                  : 'hover:bg-muted hover:text-foreground'
               }`}
               title="Inline code"
             >
@@ -310,94 +307,94 @@ export default function TiptapEditor({
             </button>
           </div>
 
-          <div className="w-px h-4 bg-border/80 mx-1" />
+          <div className="w-px h-3.5 bg-border mx-1" />
 
           {/* Lists & Quotes */}
           <div className="flex items-center gap-0.5">
             <button
               type="button"
               onClick={() => editor.chain().focus().toggleBulletList().run()}
-              className={`p-1.5 rounded-lg transition cursor-pointer ${
+              className={`p-1.5 rounded-md transition cursor-pointer ${
                 editor.isActive('bulletList')
-                  ? 'bg-primary/15 text-primary font-bold shadow-xs'
-                  : 'hover:bg-accent hover:text-accent-foreground'
+                  ? 'bg-muted text-foreground font-semibold'
+                  : 'hover:bg-muted hover:text-foreground'
               }`}
-              title="Bullet List"
+              title="Bullet list"
             >
               <List className="w-3.5 h-3.5" />
             </button>
             <button
               type="button"
               onClick={() => editor.chain().focus().toggleOrderedList().run()}
-              className={`p-1.5 rounded-lg transition cursor-pointer ${
+              className={`p-1.5 rounded-md transition cursor-pointer ${
                 editor.isActive('orderedList')
-                  ? 'bg-primary/15 text-primary font-bold shadow-xs'
-                  : 'hover:bg-accent hover:text-accent-foreground'
+                  ? 'bg-muted text-foreground font-semibold'
+                  : 'hover:bg-muted hover:text-foreground'
               }`}
-              title="Numbered List"
+              title="Numbered list"
             >
               <ListOrdered className="w-3.5 h-3.5" />
             </button>
             <button
               type="button"
               onClick={() => editor.chain().focus().toggleBlockquote().run()}
-              className={`p-1.5 rounded-lg transition cursor-pointer ${
+              className={`p-1.5 rounded-md transition cursor-pointer ${
                 editor.isActive('blockquote')
-                  ? 'bg-primary/15 text-primary font-bold shadow-xs'
-                  : 'hover:bg-accent hover:text-accent-foreground'
+                  ? 'bg-muted text-foreground font-semibold'
+                  : 'hover:bg-muted hover:text-foreground'
               }`}
-              title="Quote Callout"
+              title="Quote"
             >
               <Quote className="w-3.5 h-3.5" />
             </button>
             <button
               type="button"
               onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-              className={`p-1.5 rounded-lg transition cursor-pointer ${
+              className={`p-1.5 rounded-md transition cursor-pointer ${
                 editor.isActive('codeBlock')
-                  ? 'bg-primary/15 text-primary font-mono shadow-xs'
-                  : 'hover:bg-accent hover:text-accent-foreground'
+                  ? 'bg-muted text-foreground font-semibold'
+                  : 'hover:bg-muted hover:text-foreground'
               }`}
-              title="Code Block"
+              title="Code block"
             >
               <Code className="w-3.5 h-3.5" />
             </button>
             <button
               type="button"
               onClick={() => editor.chain().focus().setHorizontalRule().run()}
-              className="p-1.5 rounded-lg hover:bg-accent hover:text-accent-foreground transition cursor-pointer"
-              title="Horizontal Divider"
+              className="p-1.5 rounded-md hover:bg-muted hover:text-foreground transition cursor-pointer"
+              title="Divider"
             >
               <Minus className="w-3.5 h-3.5" />
             </button>
           </div>
 
-          <div className="w-px h-4 bg-border/80 mx-1" />
+          <div className="w-px h-3.5 bg-border mx-1" />
 
           {/* Link Popover */}
           <Popover open={isLinkOpen} onOpenChange={setIsLinkOpen}>
             <PopoverTrigger asChild>
               <button
                 type="button"
-                className={`p-1.5 rounded-lg transition cursor-pointer ${
+                className={`p-1.5 rounded-md transition cursor-pointer ${
                   editor.isActive('link')
-                    ? 'bg-primary/15 text-primary font-bold shadow-xs'
-                    : 'hover:bg-accent hover:text-accent-foreground'
+                    ? 'bg-muted text-foreground font-semibold'
+                    : 'hover:bg-muted hover:text-foreground'
                 }`}
-                title="Add / Edit Link"
+                title="Link"
               >
                 <LinkIcon className="w-3.5 h-3.5" />
               </button>
             </PopoverTrigger>
-            <PopoverContent className="w-80 p-3" align="start">
+            <PopoverContent className="w-72 p-2.5" align="start">
               <div className="space-y-2">
-                <div className="text-xs font-semibold text-foreground">Insert Link</div>
-                <div className="flex gap-2">
+                <div className="text-[11px] font-semibold text-foreground">Insert link</div>
+                <div className="flex gap-1.5">
                   <Input
                     placeholder="https://example.com"
                     value={linkUrl}
                     onChange={(e) => setLinkUrl(e.target.value)}
-                    className="h-8 text-xs bg-background"
+                    className="h-8 text-xs bg-card"
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
                         e.preventDefault()
@@ -405,7 +402,7 @@ export default function TiptapEditor({
                       }
                     }}
                   />
-                  <Button size="sm" onClick={setLink} className="h-8 px-3 text-xs">
+                  <Button size="sm" onClick={setLink} className="h-8 px-2.5 text-xs">
                     Apply
                   </Button>
                 </div>
@@ -419,8 +416,8 @@ export default function TiptapEditor({
                     }}
                     className="w-full h-7 text-[11px] text-destructive hover:bg-destructive/10"
                   >
-                    <Unlink className="w-3 h-3 mr-1.5" />
-                    Remove Link
+                    <Unlink className="w-3 h-3 mr-1" />
+                    Remove link
                   </Button>
                 )}
               </div>
@@ -429,20 +426,20 @@ export default function TiptapEditor({
         </div>
       )}
 
-      {/* Main Canvas Editor Area */}
-      <div className="cursor-text bg-transparent">
+      {/* Editor Content Area */}
+      <div className="cursor-text bg-card">
         <EditorContent editor={editor} />
       </div>
 
-      {/* Editor Stats Footer */}
-      <div className="border-t border-border/40 px-6 py-2.5 bg-muted/20 flex items-center justify-between text-[11px] text-muted-foreground font-medium">
-        <div className="flex items-center gap-3">
+      {/* Stats Footer */}
+      <div className="border-t border-border/60 px-6 py-2 bg-surface-secondary flex items-center justify-between text-[11px] text-muted-foreground">
+        <div className="flex items-center gap-2 font-medium">
           <span>{stats.words} words</span>
           <span>•</span>
           <span>{stats.readingTime}</span>
         </div>
-        <div className="text-[10px] text-muted-foreground/80 font-mono">
-          Markdown shortcuts supported
+        <div className="text-[10px] text-subtle-foreground font-mono">
+          Markdown supported
         </div>
       </div>
     </div>

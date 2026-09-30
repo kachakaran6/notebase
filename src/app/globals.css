@@ -2,64 +2,81 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 224 71.4% 4.1%;
-    --card: 0 0% 100%;
-    --card-foreground: 224 71.4% 4.1%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 224 71.4% 4.1%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 220 14.3% 95.9%;
-    --secondary-foreground: 220.9 39.3% 11%;
-    --muted: 220 14.3% 95.9%;
-    --muted-foreground: 220 8.9% 46.1%;
-    --accent: 220 14.3% 95.9%;
-    --accent-foreground: 220.9 39.3% 11%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 221.2 83.2% 53.3%;
-    --radius: 0.75rem;
-
-    /* Custom App Palette */
-    --accent-blue: 221.2 83.2% 53.3%;
-    --accent-indigo: 239 84% 67%;
-    --accent-purple: 262.1 83.3% 57.8%;
-    --accent-emerald: 152 76% 40%;
-    --accent-amber: 38 92% 50%;
-    --accent-rose: 346.8 77.2% 49.8%;
+    /* Editorial Neutral Light Theme */
+    --background: 45 14% 96%;        /* #F7F6F2 warm off-white */
+    --foreground: 30 4% 14%;         /* #242321 primary text */
+    --card: 0 0% 100%;               /* #FFFFFF primary surface */
+    --card-foreground: 30 4% 14%;    /* #242321 */
+    --popover: 0 0% 100%;            /* #FFFFFF */
+    --popover-foreground: 30 4% 14%; /* #242321 */
+    --surface-secondary: 45 11% 94%; /* #F1F0EC */
+    
+    /* Muted Forest Olive Accent */
+    --primary: 135 11% 38%;          /* #566B5B */
+    --primary-hover: 130 11% 31%;    /* #455847 */
+    --primary-foreground: 45 20% 98%;/* #FAF9F6 */
+    
+    --secondary: 45 11% 94%;        /* #F1F0EC */
+    --secondary-foreground: 30 4% 20%;
+    
+    --muted: 45 11% 93%;            /* #ECEAE4 */
+    --muted-foreground: 36 6% 41%;   /* #6B6862 */
+    --subtle-foreground: 37 7% 56%;  /* #96928A */
+    
+    --accent: 45 11% 93%;
+    --accent-foreground: 30 4% 14%;
+    
+    --destructive: 8 52% 47%;        /* #B84A39 muted red */
+    --destructive-foreground: 0 0% 100%;
+    
+    --warning: 37 59% 42%;           /* #A97A2C muted amber */
+    --success: 135 24% 39%;          /* #4D7A58 muted green */
+    
+    --border: 43 13% 87%;            /* #E4E1DA */
+    --border-strong: 40 10% 78%;     /* #CCC8BE */
+    --input: 43 13% 87%;
+    --ring: 135 11% 38%;
+    
+    --radius: 0.5rem;                /* 8px */
+    --radius-card: 0.625rem;         /* 10px */
+    --radius-dialog: 0.75rem;        /* 12px */
   }
 
   .dark {
-    --background: 224 71% 4%;
-    --foreground: 210 40% 98%;
-    --card: 224 71% 6%;
-    --card-foreground: 210 40% 98%;
-    --popover: 224 71% 6%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 14%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 14%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 14%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 48%;
-
-    /* Custom App Palette Dark */
-    --accent-blue: 217.2 91.2% 59.8%;
-    --accent-indigo: 239 84% 75%;
-    --accent-purple: 262.1 83.3% 68%;
-    --accent-emerald: 152 76% 50%;
-    --accent-amber: 38 92% 55%;
-    --accent-rose: 346.8 77.2% 60%;
+    /* Editorial Charcoal Dark Theme */
+    --background: 80 5% 9%;          /* #171815 deep charcoal */
+    --foreground: 50 11% 91%;        /* #ECEBE5 */
+    --card: 90 7% 12%;               /* #1D1F1B */
+    --card-foreground: 50 11% 91%;   /* #ECEBE5 */
+    --popover: 90 7% 12%;            /* #1D1F1B */
+    --popover-foreground: 50 11% 91%;
+    --surface-secondary: 84 9% 14%;  /* #23251F */
+    
+    /* Muted Sage / Olive Dark Accent */
+    --primary: 109 12% 56%;          /* #879A82 */
+    --primary-hover: 108 14% 64%;    /* #9BB096 */
+    --primary-foreground: 80 8% 8%;  /* #151713 */
+    
+    --secondary: 84 9% 14%;          /* #23251F */
+    --secondary-foreground: 50 11% 91%;
+    
+    --muted: 84 9% 15%;              /* #262822 */
+    --muted-foreground: 54 5% 65%;   /* #AAA9A1 */
+    --subtle-foreground: 70 3% 49%;  /* #7F8078 */
+    
+    --accent: 84 9% 15%;
+    --accent-foreground: 50 11% 91%;
+    
+    --destructive: 8 50% 55%;        /* #C76050 */
+    --destructive-foreground: 0 0% 100%;
+    
+    --warning: 42 47% 54%;           /* #BFA054 */
+    --success: 130 18% 52%;          /* #6E9C75 */
+    
+    --border: 75 7% 20%;             /* #34362F */
+    --border-strong: 75 6% 28%;      /* #46483E */
+    --input: 75 7% 20%;
+    --ring: 109 12% 56%;
   }
 }
 
@@ -70,23 +87,29 @@
   --color-card-foreground: hsl(var(--card-foreground));
   --color-popover: hsl(var(--popover));
   --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-surface-secondary: hsl(var(--surface-secondary));
   --color-primary: hsl(var(--primary));
   --color-primary-foreground: hsl(var(--primary-foreground));
   --color-secondary: hsl(var(--secondary));
   --color-secondary-foreground: hsl(var(--secondary-foreground));
   --color-muted: hsl(var(--muted));
   --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-subtle-foreground: hsl(var(--subtle-foreground));
   --color-accent: hsl(var(--accent));
   --color-accent-foreground: hsl(var(--accent-foreground));
   --color-destructive: hsl(var(--destructive));
   --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-warning: hsl(var(--warning));
+  --color-success: hsl(var(--success));
   --color-border: hsl(var(--border));
+  --color-border-strong: hsl(var(--border-strong));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
-  --radius-xl: calc(var(--radius) + 4px);
-  --radius-lg: var(--radius);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-sm: calc(var(--radius) - 4px);
+  
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: var(--radius);
+  --radius-lg: var(--radius-card);
+  --radius-xl: var(--radius-dialog);
 }
 
 /* Base resets & typography */
@@ -104,105 +127,86 @@ html {
 body {
   background-color: hsl(var(--background));
   color: hsl(var(--foreground));
-  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.6;
   min-height: 100vh;
 }
 
-/* Custom Typography Classes for Notebooks */
-.font-inter {
-  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
-}
-.font-geist {
-  font-family: var(--font-geist), system-ui, -apple-system, sans-serif;
-}
-.font-dm-sans {
-  font-family: var(--font-dm-sans), system-ui, -apple-system, sans-serif;
-}
-.font-manrope {
-  font-family: var(--font-manrope), system-ui, -apple-system, sans-serif;
-}
-.font-serif-elegant {
-  font-family: var(--font-serif-note), Georgia, serif;
-}
-.font-mono-code {
-  font-family: var(--font-jetbrains-mono), monospace;
-}
-
-/* Page Background Themes */
-.bg-page-default {
-  background-color: hsl(var(--background));
-}
-
-.bg-page-warm {
-  background-color: #faf8f5;
-  color: #2d2a26;
-}
-.dark .bg-page-warm {
-  background-color: #1a1816;
-  color: #f3ede2;
-}
-
-.bg-page-paper {
-  background-color: #f6f5ee;
-  color: #242424;
-}
-.dark .bg-page-paper {
-  background-color: #151614;
-  color: #e5e7eb;
-}
-
-.bg-page-dark {
-  background-color: #0b0f19;
-  color: #f8fafc;
-}
-
-.bg-page-gray {
-  background-color: #f1f5f9;
-  color: #0f172a;
-}
-.dark .bg-page-gray {
-  background-color: #0f172a;
-  color: #f8fafc;
-}
-
-.bg-page-gradient {
-  background: linear-gradient(135deg, rgba(238, 242, 255, 0.7) 0%, rgba(245, 243, 255, 0.7) 50%, rgba(253, 244, 255, 0.7) 100%);
-}
-.dark .bg-page-gradient {
-  background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 27, 75, 0.9) 50%, rgba(23, 37, 84, 0.9) 100%);
-}
-
-.bg-page-emerald {
-  background: linear-gradient(135deg, rgba(240, 253, 244, 0.8) 0%, rgba(236, 253, 245, 0.8) 100%);
-}
-.dark .bg-page-emerald {
-  background: linear-gradient(135deg, rgba(6, 44, 33, 0.8) 0%, rgba(2, 28, 21, 0.9) 100%);
-}
-
-/* Scrollbar polish */
+/* Restrained, Clean Custom Scrollbars */
 ::-webkit-scrollbar {
-  width: 7px;
-  height: 7px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: hsl(var(--muted-foreground) / 0.25);
-  border-radius: 9999px;
+  background: hsl(var(--border-strong));
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--muted-foreground) / 0.45);
+  background: hsl(var(--muted-foreground));
 }
 
-/* Tiptap / ProseMirror Document Styles */
+/* Document Themes */
+.bg-page-default {
+  background-color: hsl(var(--background));
+}
+
+.bg-page-warm {
+  background-color: #F7F6F2;
+  color: #242321;
+}
+.dark .bg-page-warm {
+  background-color: #171815;
+  color: #ECEBE5;
+}
+
+.bg-page-paper {
+  background-color: #F2EFE9;
+  color: #242321;
+}
+.dark .bg-page-paper {
+  background-color: #1B1D19;
+  color: #ECEBE5;
+}
+
+.bg-page-slate {
+  background-color: #EFEFED;
+  color: #1E1E1C;
+}
+.dark .bg-page-slate {
+  background-color: #1A1B19;
+  color: #E6E5DF;
+}
+
+.bg-page-dark {
+  background-color: #141512;
+  color: #ECEBE5;
+}
+
+/* Typography styles */
+.font-inter {
+  font-family: var(--font-inter), sans-serif;
+}
+.font-geist {
+  font-family: var(--font-geist), sans-serif;
+}
+.font-serif-elegant {
+  font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+}
+.font-mono-code {
+  font-family: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+/* Tiptap / ProseMirror Document Engine */
 .ProseMirror {
   outline: none;
   min-height: 380px;
 }
 
 .ProseMirror p.is-editor-empty:first-child::before {
-  color: hsl(var(--muted-foreground) / 0.6);
+  color: hsl(var(--subtle-foreground));
   content: attr(data-placeholder);
   float: left;
   height: 0;
@@ -210,35 +214,38 @@ body {
 }
 
 .ProseMirror h1 {
-  font-size: 2rem;
-  font-weight: 800;
+  font-size: 1.875rem; /* 30px */
+  font-weight: 600;
   line-height: 1.25;
-  margin-top: 1.5rem;
+  margin-top: 1.75rem;
   margin-bottom: 0.75rem;
-  letter-spacing: -0.025em;
+  color: hsl(var(--foreground));
+  letter-spacing: -0.015em;
 }
 
 .ProseMirror h2 {
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-size: 1.375rem; /* 22px */
+  font-weight: 600;
   line-height: 1.3;
-  margin-top: 1.25rem;
+  margin-top: 1.5rem;
   margin-bottom: 0.5rem;
-  letter-spacing: -0.02em;
+  color: hsl(var(--foreground));
 }
 
 .ProseMirror h3 {
-  font-size: 1.25rem;
+  font-size: 1.125rem; /* 18px */
   font-weight: 600;
   line-height: 1.4;
-  margin-top: 1rem;
+  margin-top: 1.25rem;
   margin-bottom: 0.35rem;
+  color: hsl(var(--foreground));
 }
 
 .ProseMirror p {
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
-  line-height: 1.75;
+  line-height: 1.65;
+  font-size: 0.9375rem; /* 15px */
 }
 
 .ProseMirror ul {
@@ -261,89 +268,58 @@ body {
 }
 
 .ProseMirror blockquote {
-  border-left: 3px solid hsl(var(--primary));
+  border-left: 2px solid hsl(var(--primary));
   padding-left: 1rem;
   margin-top: 1rem;
   margin-bottom: 1rem;
-  font-style: italic;
-  opacity: 0.9;
+  color: hsl(var(--muted-foreground));
+  font-style: normal;
 }
 
 .ProseMirror pre {
-  background-color: hsl(var(--muted));
+  background-color: hsl(var(--surface-secondary));
   color: hsl(var(--foreground));
   font-family: var(--font-jetbrains-mono), monospace;
-  padding: 1rem;
-  border-radius: 0.75rem;
+  padding: 0.875rem 1rem;
+  border-radius: 6px;
   border: 1px solid hsl(var(--border));
   overflow-x: auto;
   margin-top: 1rem;
   margin-bottom: 1rem;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
+  line-height: 1.5;
 }
 
 .ProseMirror code:not(pre code) {
-  background-color: hsl(var(--muted));
-  padding: 0.2rem 0.4rem;
-  border-radius: 0.375rem;
+  background-color: hsl(var(--surface-secondary));
+  padding: 0.15rem 0.35rem;
+  border-radius: 4px;
   font-family: var(--font-jetbrains-mono), monospace;
-  font-size: 0.85em;
-  font-weight: 500;
-  border: 1px solid hsl(var(--border) / 0.6);
+  font-size: 0.8125rem;
+  border: 1px solid hsl(var(--border));
 }
 
 .ProseMirror hr {
   border: none;
   border-top: 1px solid hsl(var(--border));
-  margin: 1.75rem 0;
+  margin: 1.5rem 0;
 }
 
 .ProseMirror mark {
-  background-color: #fef08a;
-  color: #713f12;
-  padding: 0.1em 0.3em;
-  border-radius: 0.25rem;
+  background-color: rgba(234, 179, 8, 0.2);
+  color: inherit;
+  padding: 0.1em 0.25em;
+  border-radius: 3px;
 }
 .dark .ProseMirror mark {
-  background-color: #854d0e;
-  color: #fef08a;
+  background-color: rgba(234, 179, 8, 0.25);
+  color: inherit;
 }
 
-/* Shimmer & Glow Effects */
-.glow-sm {
-  box-shadow: 0 0 20px -5px rgba(59, 130, 246, 0.15);
+/* Subtle Card Hover */
+.doc-card {
+  transition: border-color 0.15s ease, background-color 0.15s ease;
 }
-.glow-md {
-  box-shadow: 0 0 35px -5px rgba(59, 130, 246, 0.25);
-}
-.glow-lg {
-  box-shadow: 0 0 50px -10px rgba(59, 130, 246, 0.35);
-}
-
-/* Glassmorphism */
-.glass-panel {
-  background: hsl(var(--card) / 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid hsl(var(--border) / 0.6);
-}
-
-.glass-nav {
-  background: hsl(var(--background) / 0.8);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid hsl(var(--border) / 0.5);
-}
-
-/* Interactive Card Hover */
-.interactive-card {
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.interactive-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.12);
-  border-color: hsl(var(--primary) / 0.4);
-}
-.dark .interactive-card:hover {
-  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.5);
+.doc-card:hover {
+  border-color: hsl(var(--border-strong));
 }
