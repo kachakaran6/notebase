@@ -315,8 +315,8 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col font-inter">
-      {/* Top Navigation Header */}
-      <header className="border-b border-border bg-card sticky top-0 z-30 px-6 lg:px-8 py-3 flex items-center justify-between">
+      {/* Top Navigation Header (Edge-to-edge) */}
+      <header className="border-b border-border bg-card sticky top-0 z-30 px-4 sm:px-6 lg:px-8 py-2.5 flex items-center justify-between">
         {/* Left: App Logo & Name */}
         <div className="flex items-center gap-2.5">
           <Link href="/dashboard" className="flex items-center gap-2 text-foreground hover:opacity-85 transition">
@@ -330,7 +330,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Center: Search Field */}
-        <div className="hidden sm:flex items-center flex-1 max-w-sm mx-6">
+        <div className="hidden sm:flex items-center flex-1 max-w-md mx-6">
           <button
             type="button"
             onClick={() => setIsCommandOpen(true)}
@@ -353,7 +353,7 @@ export default function DashboardPage() {
             variant="outline"
             size="sm"
             onClick={() => setShowQuickNoteModal(true)}
-            className="text-xs font-medium gap-1.5"
+            className="text-xs font-medium gap-1.5 h-8"
           >
             <span>Quick Note</span>
           </Button>
@@ -361,7 +361,7 @@ export default function DashboardPage() {
           {/* New Page Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button size="sm" className="text-xs font-medium gap-1">
+              <Button size="sm" className="text-xs font-medium gap-1 h-8">
                 <Plus className="w-3.5 h-3.5" />
                 <span>New Page</span>
                 <ChevronDown className="w-3 h-3 opacity-70 ml-0.5" />
@@ -431,10 +431,10 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      {/* Main Content Area */}
-      <main className="flex-1 max-w-[1280px] w-full mx-auto px-6 lg:px-8 py-8">
+      {/* Main Content Area (Full width, responsive padding) */}
+      <main className="flex-1 w-full px-4 sm:px-6 lg:px-8 py-6">
         {/* Top Header Section */}
-        <div className="mb-6">
+        <div className="mb-5">
           <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-foreground mb-1">
             Pages
           </h1>
@@ -444,8 +444,8 @@ export default function DashboardPage() {
         </div>
 
         {/* Navigation Controls Bar */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 border-b border-border pb-2 mb-6">
-          {/* Tab Filtering (Clean underline style, no pills) */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 border-b border-border pb-2 mb-5">
+          {/* Tab Filtering */}
           <div className="flex items-center gap-6 text-xs font-medium">
             <button
               onClick={() => setSelectedFilter('all')}
@@ -552,7 +552,7 @@ export default function DashboardPage() {
             <p className="text-xs">Loading pages...</p>
           </div>
         ) : filteredPages.length === 0 ? (
-          /* Empty State (Clean & Minimal, no emoji, compact buttons) */
+          /* Empty State */
           <div className="py-16 text-center max-w-md mx-auto">
             <div className="w-10 h-10 mx-auto mb-3 rounded-lg border border-border bg-card flex items-center justify-center text-muted-foreground">
               <FileText className="w-5 h-5 text-muted-foreground" />
@@ -584,8 +584,8 @@ export default function DashboardPage() {
             </div>
           </div>
         ) : viewMode === 'grid' ? (
-          /* 3-Column Desktop Grid of Document Cards */
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          /* Responsive Edge-to-Edge Grid of Document Cards */
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5 gap-3.5">
             {filteredPages.map((page) => {
               const isPublic = page.visibility === 'public'
               const isUnlisted = page.visibility === 'unlisted'
@@ -597,7 +597,7 @@ export default function DashboardPage() {
                 <div
                   key={page.id}
                   onClick={() => router.push(`/page/${page.id}`)}
-                  className="doc-card group relative p-4 rounded-xl border border-border bg-card cursor-pointer flex flex-col justify-between hover:bg-card/90"
+                  className="doc-card group relative p-3.5 sm:p-4 rounded-xl border border-border bg-card cursor-pointer flex flex-col justify-between hover:bg-card/90 transition shadow-2xs"
                 >
                   <div>
                     {/* Top row: Icon + Title + More menu */}
@@ -651,8 +651,8 @@ export default function DashboardPage() {
                     </p>
                   </div>
 
-                  {/* Bottom metadata (Plain text + Lucide icon, NO badges/pills) */}
-                  <div className="pt-3 border-t border-border/50 flex items-center justify-between text-[11px] text-muted-foreground">
+                  {/* Bottom metadata */}
+                  <div className="pt-2.5 border-t border-border/50 flex items-center justify-between text-[11px] text-muted-foreground">
                     <div className="flex items-center gap-1">
                       <Clock className="w-3 h-3 text-subtle-foreground" />
                       <span>{formatRelativeTime(page.updatedAt)}</span>

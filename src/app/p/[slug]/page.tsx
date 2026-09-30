@@ -46,9 +46,9 @@ export default async function PublicPage({ params }: Props) {
     <div
       className={`min-h-screen ${fontClass} ${bgClass} flex flex-col font-inter transition-colors`}
     >
-      {/* Top Banner Header */}
+      {/* Top Banner Header (Edge-to-edge) */}
       <header className="border-b border-border bg-card sticky top-0 z-30">
-        <div className="max-w-[840px] mx-auto px-6 h-12 flex items-center justify-between">
+        <div className="w-full px-4 sm:px-6 lg:px-8 h-12 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 text-foreground hover:opacity-85 transition">
             <div className="w-6 h-6 rounded-md bg-secondary text-foreground flex items-center justify-center border border-border">
               <NotebookPen className="w-3.5 h-3.5 text-primary" />
@@ -69,7 +69,7 @@ export default async function PublicPage({ params }: Props) {
       </header>
 
       {/* Main Document Content */}
-      <main className="flex-1 max-w-[760px] w-full mx-auto px-6 py-12 md:py-16">
+      <main className="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
         <article className="space-y-6">
           <div className="space-y-2">
             <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-foreground leading-tight">
@@ -88,7 +88,7 @@ export default async function PublicPage({ params }: Props) {
 
           {/* Rendered Content */}
           <div
-            className="ProseMirror text-foreground leading-relaxed"
+            className="ProseMirror text-foreground leading-relaxed text-sm sm:text-base"
             dangerouslySetInnerHTML={{
               __html:
                 page.content ||
@@ -99,8 +99,8 @@ export default async function PublicPage({ params }: Props) {
       </main>
 
       {/* Subtle Footer */}
-      <footer className="border-t border-border py-8 text-center text-xs text-muted-foreground">
-        <div className="max-w-[760px] mx-auto px-6 flex items-center justify-between">
+      <footer className="border-t border-border py-6 text-xs text-muted-foreground">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
           <span>Published with Pages</span>
           <Link href="/auth/signup" className="text-primary hover:underline font-medium">
             Create your notebook

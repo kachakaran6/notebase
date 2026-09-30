@@ -305,7 +305,7 @@ export default function PageEditorPage() {
       className={`min-h-screen ${currentFontClass} ${currentBgClass} flex flex-col font-inter transition-colors`}
     >
       {/* Top Application Bar */}
-      <header className="sticky top-0 z-30 border-b border-border bg-card px-6 lg:px-8 py-2.5 flex items-center justify-between">
+      <header className="sticky top-0 z-30 border-b border-border bg-card px-4 sm:px-6 lg:px-8 py-2.5 flex items-center justify-between">
         {/* Left: Breadcrumbs / Back */}
         <div className="flex items-center gap-2 text-xs">
           <Link
@@ -316,7 +316,7 @@ export default function PageEditorPage() {
             <span>Pages</span>
           </Link>
           <span className="text-border">/</span>
-          <span className="text-foreground font-semibold truncate max-w-[200px]">
+          <span className="text-foreground font-semibold truncate max-w-[240px]">
             {title || 'Untitled'}
           </span>
         </div>
@@ -461,10 +461,10 @@ export default function PageEditorPage() {
         </div>
       </header>
 
-      {/* Editor Main Canvas */}
-      <main className="flex-1 max-w-[900px] w-full mx-auto px-6 lg:px-8 py-8">
+      {/* Editor Main Canvas (Expansive, compact, readable) */}
+      <main className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Document Title Header */}
-        <div className="mb-6 space-y-2">
+        <div className="mb-4 space-y-1">
           <input
             type="text"
             value={title}

@@ -84,7 +84,7 @@ export default function TiptapEditor({
     editorProps: {
       attributes: {
         class:
-          'ProseMirror min-h-[420px] p-6 sm:p-8 focus:outline-none text-foreground leading-relaxed text-sm sm:text-base font-inter selection:bg-primary/20',
+          'ProseMirror min-h-[480px] p-4 sm:p-6 lg:p-7 focus:outline-none text-foreground leading-relaxed text-sm sm:text-base font-inter selection:bg-primary/20',
       },
     },
     immediatelyRender: false,
