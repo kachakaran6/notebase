@@ -48,7 +48,7 @@ export function LandingHeader() {
         <div
           className={`pointer-events-auto flex items-center justify-between transition-all duration-300 ease-out ${
             isScrolled
-              ? 'w-[calc(100%-16px)] sm:w-[92%] max-w-[960px] h-[52px] sm:h-[56px] px-3.5 sm:px-5 bg-white/80 dark:bg-[#1D1F1B]/80 backdrop-blur-md border border-[#E3E1DA]/85 dark:border-[#34362F]/85 shadow-[0_6px_24px_rgba(36,37,34,0.08)] dark:shadow-[0_6px_24px_rgba(0,0,0,0.35)] rounded-2xl'
+              ? 'w-[calc(100%-16px)] sm:w-[92%] max-w-[960px] h-[52px] sm:h-[56px] px-3.5 sm:px-5 bg-white/95 dark:bg-[#1D1F1B]/95 backdrop-blur-md border border-[#E3E1DA] dark:border-[#34362F] shadow-[0_4px_20px_rgba(0,0,0,0.06)] dark:shadow-[0_6px_28px_rgba(0,0,0,0.45)] rounded-2xl'
               : 'w-full max-w-[1200px] h-16 sm:h-18 px-0 bg-transparent border-transparent shadow-none rounded-none'
           }`}
         >

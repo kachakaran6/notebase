@@ -9,7 +9,7 @@ export function ThemeToggle({
 }: {
   className?: string
 }) {
-  const { theme, setTheme } = useTheme()
+  const { setTheme, resolvedTheme } = useTheme()
   const [mounted, setMounted] = React.useState(false)
 
   React.useEffect(() => {
@@ -28,24 +28,25 @@ export function ThemeToggle({
     )
   }
 
-  const cycleTheme = () => {
-    if (theme === "light") setTheme("dark")
-    else if (theme === "dark") setTheme("system")
-    else setTheme("light")
+  const toggleTheme = () => {
+    const nextTheme = resolvedTheme === "dark" ? "light" : "dark"
+    setTheme(nextTheme)
   }
+
+  const isDark = resolvedTheme === "dark"
 
   return (
     <button
       type="button"
-      onClick={cycleTheme}
+      onClick={toggleTheme}
       className={`inline-flex items-center justify-center w-8 h-8 rounded-lg border border-border bg-card hover:bg-muted text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring cursor-pointer ${className}`}
-      title={`Current: ${theme || "system"} (Click to cycle Light / Dark / System)`}
-      aria-label="Toggle theme"
+      title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+      aria-label={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
     >
-      {theme === "dark" ? (
-        <Moon className="h-3.5 w-3.5" />
-      ) : (
+      {isDark ? (
         <Sun className="h-3.5 w-3.5" />
+      ) : (
+        <Moon className="h-3.5 w-3.5" />
       )}
     </button>
   )
