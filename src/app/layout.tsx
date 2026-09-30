@@ -26,6 +26,7 @@ export const viewport: Viewport = {
 }
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://notebase.samast.pro'),
   title: {
     default: 'Notebase — Personal Knowledge & Notebook',
     template: '%s | Notebase',
