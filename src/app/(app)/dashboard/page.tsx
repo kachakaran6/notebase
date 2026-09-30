@@ -73,6 +73,8 @@ import { Page, Template, Visibility } from '@/types/page'
 import { formatRelativeTime, stripHtml } from '@/lib/utils'
 import { toast } from 'sonner'
 
+import { BrandLogo } from '@/components/brand-logo'
+
 interface TemplatePreset {
   id: Template
   label: string
@@ -331,12 +333,10 @@ export default function DashboardPage() {
         <div className="flex items-center justify-between gap-3">
           {/* Left: App Logo & Name */}
           <div className="flex items-center gap-2.5 shrink-0">
-            <Link href="/dashboard" className="flex items-center gap-2 text-foreground hover:opacity-85 transition">
-              <div className="w-7 h-7 rounded-md bg-secondary text-foreground flex items-center justify-center border border-border shrink-0">
-                <NotebookPen className="w-4 h-4 text-primary" />
-              </div>
+            <Link href="/dashboard" className="flex items-center gap-2.5 text-foreground hover:opacity-85 transition">
+              <BrandLogo size={26} />
               <span className="text-sm font-semibold tracking-tight">
-                Pages
+                Notebase
               </span>
             </Link>
           </div>
@@ -472,11 +472,9 @@ export default function DashboardPage() {
               <SheetContent side="right" className="w-[85vw] max-w-xs p-5 flex flex-col justify-between">
                 <div>
                   <SheetHeader className="pb-4 border-b border-border text-left">
-                    <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-md bg-secondary text-foreground flex items-center justify-center border border-border shrink-0">
-                        <NotebookPen className="w-4 h-4 text-primary" />
-                      </div>
-                      <SheetTitle className="text-sm font-semibold">Pages</SheetTitle>
+                    <div className="flex items-center gap-2.5">
+                      <BrandLogo size={24} />
+                      <SheetTitle className="text-sm font-semibold">Notebase</SheetTitle>
                     </div>
                     {userEmail && (
                       <div className="text-[11px] text-muted-foreground truncate pt-1 font-mono">

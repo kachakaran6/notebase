@@ -2,7 +2,6 @@ import { notFound } from 'next/navigation'
 import { getPageBySlug } from '@/lib/pages-api'
 import Link from 'next/link'
 import {
-  NotebookPen,
   Globe,
   Clock,
   ArrowRight,
@@ -11,6 +10,7 @@ import {
 import type { Metadata } from 'next'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { Button } from '@/components/ui/button'
+import { BrandLogo } from '@/components/brand-logo'
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -19,10 +19,28 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const page = await getPageBySlug(slug)
-  if (!page) return { title: 'Page Not Found — Pages' }
+  if (!page) return { title: 'Page Not Found — Notebase' }
   return {
-    title: `${page.title} — Pages`,
-    description: `Published document on Pages`,
+    title: `${page.title} — Notebase`,
+    description: `Published document on Notebase`,
+    openGraph: {
+      title: `${page.title} — Notebase`,
+      description: 'Personal knowledge, notes, prompts, and ideas.',
+      siteName: 'Notebase',
+      images: [
+        {
+          url: '/notebase.png',
+          width: 512,
+          height: 512,
+          alt: 'Notebase',
+        },
+      ],
+    },
+    icons: {
+      icon: '/notebase.png',
+      shortcut: '/notebase.png',
+      apple: '/notebase.png',
+    },
   }
 }
 
@@ -50,11 +68,9 @@ export default async function PublicPage({ params }: Props) {
       <header className="border-b border-border bg-card sticky top-0 z-30">
         <div className="w-full px-3.5 sm:px-6 lg:px-8 h-12 flex items-center justify-between gap-2 min-w-0">
           <Link href="/" className="flex items-center gap-2 text-foreground hover:opacity-85 transition shrink-0">
-            <div className="w-6 h-6 rounded-md bg-secondary text-foreground flex items-center justify-center border border-border shrink-0">
-              <NotebookPen className="w-3.5 h-3.5 text-primary" />
-            </div>
+            <BrandLogo size={22} />
             <span className="font-semibold text-xs tracking-tight">
-              Pages
+              Notebase
             </span>
           </Link>
 
@@ -103,9 +119,9 @@ export default async function PublicPage({ params }: Props) {
       {/* Subtle Footer */}
       <footer className="border-t border-border py-6 text-xs text-muted-foreground">
         <div className="max-w-4xl mx-auto px-3.5 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
-          <span>Published with Pages</span>
+          <span>Published with Notebase</span>
           <Link href="/auth/signup" className="text-primary hover:underline font-medium">
-            Create your notebook
+            Create your Notebase
           </Link>
         </div>
       </footer>

@@ -2,7 +2,6 @@ import { getCurrentUser } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import {
-  NotebookPen,
   Lock,
   Globe,
   Link as LinkIcon,
@@ -18,6 +17,7 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ThemeToggle } from '@/components/theme-toggle'
+import { BrandLogo } from '@/components/brand-logo'
 
 export default async function HomePage() {
   const user = await getCurrentUser()
@@ -32,11 +32,9 @@ export default async function HomePage() {
       <header className="border-b border-border bg-card sticky top-0 z-40">
         <div className="max-w-[1400px] mx-auto px-3.5 sm:px-6 lg:px-8 h-14 flex items-center justify-between gap-2 min-w-0">
           <Link href="/" className="flex items-center gap-2 text-foreground shrink-0">
-            <div className="w-7 h-7 rounded-md bg-secondary text-foreground flex items-center justify-center border border-border shrink-0">
-              <NotebookPen className="w-4 h-4 text-primary" />
-            </div>
+            <BrandLogo size={26} />
             <span className="font-semibold text-sm tracking-tight">
-              Pages
+              Notebase
             </span>
           </Link>
 
@@ -61,7 +59,7 @@ export default async function HomePage() {
             </Link>
             <Link href="/auth/signup">
               <Button size="sm" className="text-xs font-medium h-8 px-2.5 sm:px-3">
-                <span className="hidden xs:inline">Open </span>Notebook
+                <span className="hidden xs:inline">Open </span>Notebase
               </Button>
             </Link>
           </div>
@@ -76,7 +74,7 @@ export default async function HomePage() {
           </h1>
 
           <p className="text-xs sm:text-sm md:text-base text-secondary-foreground max-w-2xl mx-auto mb-6 sm:mb-8 leading-relaxed font-normal break-words">
-            A fast, distraction-free document application. Write in rich text, organize your thoughts, and share secret read-only links in seconds with zero friction.
+            A calm, distraction-free document and knowledge tool. Write in rich text, organize your knowledge base, and share secret read-only links in seconds with zero friction.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-2.5 sm:gap-3 mb-10 sm:mb-14 w-full max-w-xs sm:max-w-none mx-auto">
@@ -256,9 +254,9 @@ export default async function HomePage() {
       <footer className="py-6 sm:py-8 bg-card border-t border-border text-xs text-muted-foreground px-3.5 sm:px-6 lg:px-8">
         <div className="max-w-[1400px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left min-w-0">
           <div className="flex items-center gap-2 text-foreground">
-            <NotebookPen className="w-3.5 h-3.5 text-primary shrink-0" />
-            <span className="font-semibold">Pages</span>
-            <span className="text-muted-foreground font-normal hidden xs:inline">— Personal Knowledge System</span>
+            <BrandLogo size={20} />
+            <span className="font-semibold">Notebase</span>
+            <span className="text-muted-foreground font-normal hidden xs:inline">• Personal Knowledge System</span>
           </div>
           <div className="flex items-center gap-4 shrink-0">
             <Link href="/auth/login" className="hover:text-foreground transition-colors">

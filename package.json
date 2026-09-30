@@ -1,7 +1,7 @@
 {
-  "name": "internet-notebook",
+  "name": "notebase",
   "version": "1.0.0",
-  "description": "A personal-first lightweight knowledge/page system",
+  "description": "A personal-first lightweight knowledge, notes, and document platform",
   "main": "index.js",
   "scripts": {
     "dev": "next dev",

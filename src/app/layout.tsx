@@ -27,10 +27,15 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: 'Pages — Internet Notebook',
-    template: '%s | Internet Notebook',
+    default: 'Notebase — Personal Knowledge & Notebook',
+    template: '%s | Notebase',
   },
-  description: 'A personal knowledge and page system. Write, organize, and share your notes and ideas.',
+  description: 'A calm, personal knowledge base and document editor. Write, organize, and share notes, prompts, and ideas.',
+  icons: {
+    icon: '/notebase.png',
+    shortcut: '/notebase.png',
+    apple: '/notebase.png',
+  },
 }
 
 export default function RootLayout({

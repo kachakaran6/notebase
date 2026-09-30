@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
-  NotebookPen,
   Mail,
   Lock,
   Eye,
@@ -17,6 +16,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
 import { ThemeToggle } from '@/components/theme-toggle'
+import { BrandLogo } from '@/components/brand-logo'
 import { toast } from 'sonner'
 
 export default function LoginPage() {
@@ -76,12 +76,12 @@ export default function LoginPage() {
         <div className="w-full max-w-sm">
           <div className="border border-border bg-card p-5 sm:p-7 rounded-xl shadow-xs space-y-4 sm:space-y-5 min-w-0">
             {/* Header */}
-            <div className="space-y-1 text-left">
-              <div className="w-8 h-8 rounded-md bg-secondary text-foreground flex items-center justify-center border border-border mb-3">
-                <NotebookPen className="w-4 h-4 text-primary" />
+            <div className="space-y-1.5 text-left">
+              <div className="mb-3 inline-block">
+                <BrandLogo size={32} />
               </div>
               <h1 className="text-lg font-semibold tracking-tight text-foreground">
-                Sign in to Pages
+                Sign in to Notebase
               </h1>
               <p className="text-xs text-muted-foreground">
                 Enter your email and password to access your notebook.
@@ -180,7 +180,7 @@ export default function LoginPage() {
 
       {/* Footer */}
       <footer className="py-4 text-center text-[11px] text-subtle-foreground">
-        Pages • Personal Knowledge System
+        Notebase • Personal Knowledge System
       </footer>
     </div>
   )

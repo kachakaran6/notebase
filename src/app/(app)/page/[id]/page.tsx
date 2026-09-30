@@ -43,6 +43,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog'
+import { BrandLogo } from '@/components/brand-logo'
 import {
   Popover,
   PopoverContent,
@@ -290,7 +291,7 @@ export default function PageEditorPage() {
             {error || "This document doesn't exist or you don't have permission to edit it."}
           </p>
           <Button onClick={() => router.push('/dashboard')} size="sm">
-            Back to Pages
+            Back to Notebase
           </Button>
         </Card>
       </div>
@@ -310,14 +311,14 @@ export default function PageEditorPage() {
         <div className="flex items-center gap-1.5 sm:gap-2 text-xs min-w-0">
           <Link
             href="/dashboard"
-            className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition font-medium shrink-0 p-1 -ml-1 rounded hover:bg-muted"
-            title="Back to Pages"
+            className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition font-medium shrink-0 p-1 -ml-1 rounded hover:bg-muted"
+            title="Back to Notebase"
           >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span className="hidden xs:inline">Pages</span>
+            <BrandLogo size={18} />
+            <span className="hidden xs:inline font-semibold text-foreground">Notebase</span>
           </Link>
           <span className="text-border shrink-0">/</span>
-          <span className="text-foreground font-semibold truncate max-w-[90px] xs:max-w-[140px] sm:max-w-[240px]">
+          <span className="text-foreground font-medium truncate max-w-[90px] xs:max-w-[140px] sm:max-w-[240px]">
             {title || 'Untitled'}
           </span>
         </div>
