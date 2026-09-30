@@ -48,7 +48,7 @@ export function LandingHeader() {
         <div
           className={`pointer-events-auto flex items-center justify-between transition-all duration-300 ease-out ${
             isScrolled
-              ? 'w-[calc(100%-16px)] sm:w-[92%] max-w-[960px] h-[52px] sm:h-[56px] px-3.5 sm:px-5 bg-white/95 dark:bg-[#1D1F1B]/95 backdrop-blur-md border border-[#E3E1DA] dark:border-[#34362F] shadow-[0_4px_20px_rgba(0,0,0,0.06)] dark:shadow-[0_6px_28px_rgba(0,0,0,0.45)] rounded-2xl'
+              ? 'w-[calc(100%-16px)] sm:w-[92%] max-w-[960px] h-[52px] sm:h-[56px] px-3.5 sm:px-5 bg-card/95 backdrop-blur-md border border-border shadow-md rounded-2xl'
               : 'w-full max-w-[1200px] h-16 sm:h-18 px-0 bg-transparent border-transparent shadow-none rounded-none'
           }`}
         >
@@ -71,7 +71,7 @@ export function LandingHeader() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-xs font-normal h-8 px-2.5 sm:px-3 text-muted-foreground hover:text-foreground cursor-pointer"
+                className="text-xs font-normal h-8 px-2.5 sm:px-3 text-muted-foreground hover:text-foreground hover:bg-muted/80 cursor-pointer"
               >
                 Sign In
               </Button>
@@ -79,7 +79,7 @@ export function LandingHeader() {
             <Link href="/auth/signup">
               <Button
                 size="sm"
-                className="text-xs font-medium h-8 px-3.5 shadow-2xs hover:opacity-95 cursor-pointer"
+                className="text-xs font-medium h-8 px-3.5 shadow-2xs hover:opacity-95 cursor-pointer bg-primary text-primary-foreground"
               >
                 Open Notebase
               </Button>

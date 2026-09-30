@@ -137,6 +137,11 @@ export default function PageEditorPage() {
   const [shareLoading, setShareLoading] = useState(false)
   const [isStylePopoverOpen, setIsStylePopoverOpen] = useState(false)
 
+  // Custom Slug Editing
+  const [slugInput, setSlugInput] = useState('')
+  const [isEditingSlug, setIsEditingSlug] = useState(false)
+  const [isSavingSlug, setIsSavingSlug] = useState(false)
+
   // Initialize state once page is fetched
   useEffect(() => {
     if (page) {
@@ -148,6 +153,7 @@ export default function PageEditorPage() {
       setFont((page.font as Font) || 'inter')
       setBackground((page.background as Background) || 'default')
       setAccent((page.accent as Accent) || 'blue')
+      setSlugInput(page.slug || '')
       setLastSaved(new Date(page.updatedAt))
     }
   }, [page])
@@ -259,6 +265,21 @@ export default function PageEditorPage() {
       toast.error('Failed to revoke link')
     } finally {
       setShareLoading(false)
+    }
+  }
+
+  const handleSaveSlug = async () => {
+    if (!slugInput.trim() || !page) return
+    setIsSavingSlug(true)
+    try {
+      const updated = await updatePage({ slug: slugInput.trim() })
+      setSlugInput(updated.slug)
+      setIsEditingSlug(false)
+      toast.success(`Custom URL updated: /p/${updated.slug}`)
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to update custom URL')
+    } finally {
+      setIsSavingSlug(false)
     }
   }
 
@@ -577,38 +598,103 @@ export default function PageEditorPage() {
               </div>
             </div>
 
-            {/* Public Link Section */}
+            {/* Public Link Section with Editable URL Slug */}
             {visibility === 'public' && (
-              <div className="p-3 rounded-lg bg-surface-secondary border border-border space-y-2">
+              <div className="p-3 rounded-lg bg-surface-secondary border border-border space-y-2.5">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="font-medium text-foreground">Public URL</span>
-                  <a
-                    href={`/p/${page.slug}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-primary hover:underline flex items-center gap-1 text-[11px]"
-                  >
-                    <span>View page</span>
-                    <ExternalLink className="w-3 h-3" />
-                  </a>
+                  <span className="font-semibold text-foreground">Custom Public URL</span>
+                  {!isEditingSlug ? (
+                    <button
+                      onClick={() => setIsEditingSlug(true)}
+                      className="text-[11px] text-primary hover:underline font-medium cursor-pointer"
+                    >
+                      Edit URL slug
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        setSlugInput(page.slug)
+                        setIsEditingSlug(false)
+                      }}
+                      className="text-[11px] text-muted-foreground hover:text-foreground cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+                  )}
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <Input
-                    readOnly
-                    value={`${typeof window !== 'undefined' ? window.location.origin : ''}/p/${page.slug}`}
-                    className="font-mono text-xs h-8 bg-card select-all"
-                  />
-                  <Button
-                    size="sm"
-                    onClick={() =>
-                      handleCopyUrl(`${window.location.origin}/p/${page.slug}`)
-                    }
-                    className="h-8 px-2.5 text-xs"
-                  >
-                    {copiedLink ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                    <span>{copiedLink ? 'Copied' : 'Copy'}</span>
-                  </Button>
-                </div>
+
+                {isEditingSlug ? (
+                  <div className="space-y-2 pt-0.5">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-xs font-mono text-muted-foreground shrink-0 select-none">
+                        /p/
+                      </span>
+                      <Input
+                        value={slugInput}
+                        onChange={(e) =>
+                          setSlugInput(
+                            e.target.value
+                              .toLowerCase()
+                              .replace(/[^a-z0-9-]/g, '-')
+                              .replace(/-+/g, '-')
+                          )
+                        }
+                        placeholder="custom-slug"
+                        className="font-mono text-xs h-8 bg-card flex-1"
+                        autoFocus
+                      />
+                      <Button
+                        size="sm"
+                        disabled={isSavingSlug || !slugInput.trim() || slugInput === page.slug}
+                        onClick={handleSaveSlug}
+                        className="h-8 px-3 text-xs shrink-0 cursor-pointer"
+                      >
+                        {isSavingSlug ? 'Saving...' : 'Save URL'}
+                      </Button>
+                    </div>
+                    <p className="text-[11px] text-muted-foreground leading-normal">
+                      Customize your link (e.g. <span className="font-mono text-foreground">server-deployment-notes</span>).
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-1.5">
+                      <Input
+                        readOnly
+                        value={`${typeof window !== 'undefined' ? window.location.origin : ''}/p/${page.slug}`}
+                        className="font-mono text-xs h-8 bg-card select-all"
+                      />
+                      <Button
+                        size="sm"
+                        onClick={() =>
+                          handleCopyUrl(`${window.location.origin}/p/${page.slug}`)
+                        }
+                        className="h-8 px-2.5 text-xs shrink-0 cursor-pointer"
+                      >
+                        {copiedLink ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                        <span>{copiedLink ? 'Copied' : 'Copy'}</span>
+                      </Button>
+                    </div>
+
+                    <div className="flex items-center justify-between text-xs pt-0.5">
+                      <a
+                        href={`/p/${page.slug}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-primary hover:underline flex items-center gap-1 text-[11px] font-medium"
+                      >
+                        <span>Open public page</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                      <button
+                        onClick={() => setIsEditingSlug(true)}
+                        className="text-[11px] text-muted-foreground hover:text-foreground cursor-pointer"
+                      >
+                        Change slug
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 

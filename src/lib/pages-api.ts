@@ -1,6 +1,6 @@
 import { db } from './db'
 import { pages, shareLinks } from './db-schema'
-import { eq, and, ilike, desc, or } from 'drizzle-orm'
+import { eq, and, ilike, desc, or, ne } from 'drizzle-orm'
 import { nanoid } from './utils'
 import type { Page, NewPage } from './db-schema'
 
@@ -88,6 +88,7 @@ export async function updatePage(
   userId: string,
   updates: Partial<{
     title: string
+    slug: string
     content: string | null
     icon: string | null
     cover: string | null
@@ -98,9 +99,37 @@ export async function updatePage(
     accent: string
   }>
 ): Promise<Page> {
+  const payload: Record<string, unknown> = { ...updates, updatedAt: new Date() }
+
+  if (updates.slug !== undefined) {
+    const normalizedSlug = updates.slug
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .trim()
+      .slice(0, 80)
+
+    if (normalizedSlug.length < 2) {
+      throw new Error('Custom URL slug must be at least 2 characters')
+    }
+
+    // Check if another page is already using this slug
+    const [existing] = await db
+      .select({ id: pages.id })
+      .from(pages)
+      .where(and(eq(pages.slug, normalizedSlug), ne(pages.id, id)))
+
+    if (existing) {
+      throw new Error('This custom URL slug is already taken. Please choose another.')
+    }
+
+    payload.slug = normalizedSlug
+  }
+
   const [updatedPage] = await db
     .update(pages)
-    .set({ ...updates, updatedAt: new Date() })
+    .set(payload)
     .where(and(eq(pages.id, id), eq(pages.userId, userId)))
     .returning()
 
