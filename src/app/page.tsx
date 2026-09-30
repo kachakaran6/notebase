@@ -18,6 +18,7 @@ import { Button } from '@/components/ui/button'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { BrandLogo } from '@/components/brand-logo'
 import { PwaStandaloneRedirect } from '@/components/pwa-standalone-redirect'
+import { LandingHeader } from '@/components/landing-header'
 
 export const metadata: Metadata = {
   title: 'Notebase — Your notes. Your ideas. One place.',
@@ -49,42 +50,12 @@ export default async function HomePage() {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col font-inter selection:bg-primary/20 selection:text-primary">
       <PwaStandaloneRedirect />
-
-      {/* Clean Minimal Header */}
-      <header className="border-b border-border bg-card sticky top-0 z-40">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-3 min-w-0">
-          <Link
-            href="/"
-            className="flex items-center gap-2 text-foreground hover:opacity-90 transition shrink-0"
-          >
-            <BrandLogo size={24} />
-            <span className="font-semibold text-sm tracking-tight">Notebase</span>
-          </Link>
-
-          <div className="flex items-center gap-2 shrink-0">
-            <ThemeToggle />
-            <Link href="/auth/login">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-xs font-normal h-8 px-2.5 sm:px-3 text-muted-foreground hover:text-foreground"
-              >
-                Sign In
-              </Button>
-            </Link>
-            <Link href="/auth/signup">
-              <Button size="sm" className="text-xs font-medium h-8 px-3">
-                Open Notebase
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </header>
+      <LandingHeader />
 
       {/* Main Focus Area */}
       <main className="flex-1 flex flex-col justify-between">
         {/* Hero Section */}
-        <section className="pt-14 pb-8 sm:pt-20 sm:pb-12 md:pt-28 md:pb-16 px-4 sm:px-6">
+        <section className="pt-8 pb-8 sm:pt-14 sm:pb-12 md:pt-18 md:pb-16 px-4 sm:px-6">
           <div className="max-w-3xl mx-auto text-center min-w-0">
             {/* Bold, Clean Charcoal Heading */}
             <h1 className="text-4xl sm:text-6xl md:text-7xl font-semibold tracking-tight text-foreground leading-[1.08] mb-5 sm:mb-6">
@@ -367,24 +338,28 @@ export default async function HomePage() {
         </section>
       </main>
 
-      {/* Minimal Footer */}
-      <footer className="py-6 border-t border-border bg-card text-xs text-muted-foreground px-4 sm:px-6 lg:px-8">
-        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
-          <div className="flex items-center gap-2 text-foreground">
+      {/* Minimal Professional Footer */}
+      <footer className="border-t border-border bg-background py-6 sm:py-8 px-4 sm:px-8 md:px-12 text-xs text-muted-foreground">
+        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left min-w-0">
+          <Link
+            href="/"
+            className="flex items-center gap-2 text-foreground hover:opacity-85 transition shrink-0"
+          >
             <BrandLogo size={18} />
-            <span className="font-semibold text-xs">Notebase</span>
-            <span className="text-subtle-foreground font-normal">• Personal Knowledge System</span>
-          </div>
-          <div className="flex items-center gap-4 text-xs">
-            <Link href="/auth/login" className="hover:text-foreground transition-colors">
-              Sign In
-            </Link>
-            <Link
-              href="/auth/signup"
-              className="text-primary hover:underline font-medium transition-colors"
+            <span className="font-semibold text-xs tracking-tight">Notebase</span>
+          </Link>
+
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <span>Made by</span>
+            <a
+              href="https://karan-pms.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-foreground hover:text-primary transition inline-flex items-center gap-1"
             >
-              Create Account
-            </Link>
+              <span>Karan</span>
+              <span className="text-[11px] text-subtle-foreground">↗</span>
+            </a>
           </div>
         </div>
       </footer>
