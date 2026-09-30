@@ -74,6 +74,7 @@ import { formatRelativeTime, stripHtml } from '@/lib/utils'
 import { toast } from 'sonner'
 
 import { BrandLogo } from '@/components/brand-logo'
+import { PwaInstallPrompt } from '@/components/pwa-install-prompt'
 
 interface TemplatePreset {
   id: Template
@@ -402,6 +403,9 @@ export default function DashboardPage() {
             </DropdownMenu>
 
             <div className="h-4 w-px bg-border mx-0.5" />
+
+            {/* PWA Install Button (shows when browser triggers install event) */}
+            <PwaInstallPrompt />
 
             {/* Theme Toggle */}
             <ThemeToggle />

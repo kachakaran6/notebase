@@ -6,6 +6,7 @@ import { Menu, ArrowRight, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { BrandLogo } from '@/components/brand-logo'
+import { PwaInstallPrompt } from '@/components/pwa-install-prompt'
 import {
   Sheet,
   SheetContent,
@@ -66,6 +67,7 @@ export function LandingHeader() {
 
           {/* Right: Desktop Actions */}
           <div className="hidden sm:flex items-center gap-2 sm:gap-3 shrink-0">
+            <PwaInstallPrompt />
             <ThemeToggle className="h-8 w-8" />
             <Link href="/auth/login">
               <Button
@@ -88,6 +90,7 @@ export function LandingHeader() {
 
           {/* Right: Mobile Controls (< sm) */}
           <div className="flex sm:hidden items-center gap-1.5 shrink-0">
+            <PwaInstallPrompt />
             <ThemeToggle className="h-8 w-8" />
 
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>

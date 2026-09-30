@@ -1,0 +1,34 @@
+import type { MetadataRoute } from 'next'
+
+export default function manifest(): MetadataRoute.Manifest {
+  return {
+    name: 'Notebase — Personal Knowledge & Notebook',
+    short_name: 'Notebase',
+    description: 'A calm, personal knowledge base and document editor. Write, organize, and share notes, prompts, and ideas.',
+    start_url: '/',
+    display: 'standalone',
+    orientation: 'portrait',
+    background_color: '#F7F6F2',
+    theme_color: '#566B5B',
+    icons: [
+      {
+        src: '/notebase.png',
+        sizes: '192x192',
+        type: 'image/png',
+        purpose: 'any',
+      },
+      {
+        src: '/notebase.png',
+        sizes: '512x512',
+        type: 'image/png',
+        purpose: 'any',
+      },
+      {
+        src: '/notebase.png',
+        sizes: '512x512',
+        type: 'image/png',
+        purpose: 'maskable',
+      },
+    ],
+  }
+}

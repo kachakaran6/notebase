@@ -3,6 +3,7 @@ import { Inter, JetBrains_Mono } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from 'sonner'
+import { PwaRegister } from '@/components/pwa-register'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -32,11 +33,21 @@ export const metadata: Metadata = {
     template: '%s | Notebase',
   },
   description: 'A calm, personal knowledge base and document editor. Write, organize, and share notes, prompts, and ideas.',
+  applicationName: 'Notebase',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Notebase',
+  },
+  formatDetection: {
+    telephone: false,
+  },
   icons: {
     icon: '/notebase.png',
     shortcut: '/notebase.png',
     apple: '/notebase.png',
   },
+  manifest: '/manifest.json',
 }
 
 export default function RootLayout({
@@ -51,6 +62,7 @@ export default function RootLayout({
       className={`${inter.variable} ${jetbrainsMono.variable}`}
     >
       <body className="min-h-screen bg-background text-foreground font-inter antialiased selection:bg-primary/20 selection:text-primary">
+        <PwaRegister />
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
