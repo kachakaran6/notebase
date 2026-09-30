@@ -188,7 +188,7 @@ export default async function HomePage() {
                         Instant Sharing
                       </div>
                       <p className="text-xs text-muted-foreground">
-                        One click to copy link -> WhatsApp -> colleague views instantly without account.
+                        One click to copy link &rarr; WhatsApp &rarr; colleague views instantly without account.
                       </p>
                     </div>
                   </div>
