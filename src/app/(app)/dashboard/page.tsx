@@ -303,11 +303,14 @@ export default function DashboardPage() {
 
   // Filtered and sorted pages
   const filteredPages = useMemo(() => {
-    let result = pages.filter((page) => {
+    let result = (pages || []).filter((page) => {
+      const title = page?.title || ''
+      const content = page?.content || ''
+      const search = (searchQuery || '').toLowerCase()
+
       const matchesSearch =
-        page.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (page.content &&
-          page.content.toLowerCase().includes(searchQuery.toLowerCase()))
+        title.toLowerCase().includes(search) ||
+        content.toLowerCase().includes(search)
 
       const matchesFilter =
         selectedFilter === 'all' ? true : page.visibility === selectedFilter
@@ -318,15 +321,15 @@ export default function DashboardPage() {
     if (sortBy === 'updated') {
       result.sort(
         (a, b) =>
-          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+          new Date(b?.updatedAt || 0).getTime() - new Date(a?.updatedAt || 0).getTime()
       )
     } else if (sortBy === 'created') {
       result.sort(
         (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          new Date(b?.createdAt || 0).getTime() - new Date(a?.createdAt || 0).getTime()
       )
     } else if (sortBy === 'alphabetical') {
-      result.sort((a, b) => a.title.localeCompare(b.title))
+      result.sort((a, b) => (a?.title || '').localeCompare(b?.title || ''))
     }
 
     return result
@@ -727,7 +730,7 @@ export default function DashboardPage() {
         )}
 
         {/* Content Section */}
-        {loading && pages.length === 0 ? (
+        {(loading || (isRevalidating && pages.length === 0)) ? (
           /* Rich Modern Skeleton Workspace Loader */
           <div className="space-y-4">
             <div className="flex items-center justify-between text-xs text-muted-foreground pb-2 border-b border-border/40">

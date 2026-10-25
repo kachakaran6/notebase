@@ -8,7 +8,7 @@ import {
   duplicatePage as duplicatePageApi
 } from '@/lib/client-api'
 
-const PAGES_CACHE_KEY = 'notebase_pages_cache_v1'
+const PAGES_CACHE_KEY = 'notebase_pages_cache_v2'
 
 interface UsePagesReturn {
   pages: Page[]
@@ -31,7 +31,7 @@ function getLocalCache(): Page[] | null {
     const raw = localStorage.getItem(PAGES_CACHE_KEY)
     if (!raw) return null
     const parsed = JSON.parse(raw)
-    return Array.isArray(parsed) ? parsed : null
+    return Array.isArray(parsed) && parsed.length > 0 ? parsed : null
   } catch {
     return null
   }
@@ -41,7 +41,9 @@ function getLocalCache(): Page[] | null {
 function setLocalCache(pages: Page[]) {
   if (typeof window === 'undefined') return
   try {
-    localStorage.setItem(PAGES_CACHE_KEY, JSON.stringify(pages))
+    if (Array.isArray(pages) && pages.length > 0) {
+      localStorage.setItem(PAGES_CACHE_KEY, JSON.stringify(pages))
+    }
   } catch {
     // Ignore storage quota errors
   }
@@ -53,29 +55,36 @@ export function usePages(): UsePagesReturn {
   const [isRevalidating, setIsRevalidating] = useState(false)
   const [isSlowConnection, setIsSlowConnection] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const hasInitialized = useRef(false)
+  
+  const retryCountRef = useRef(0)
+  const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const isFetchingRef = useRef(false)
 
   // Initial load: instant cached data if available (Stale-While-Revalidate)
   useEffect(() => {
-    if (hasInitialized.current) return
-    hasInitialized.current = true
-
     const cached = getLocalCache()
     if (cached && cached.length > 0) {
       setPages(cached)
+      // We still revalidate from network in the background, but screen is immediately populated!
       setLoading(false)
       setIsRevalidating(true)
     }
   }, [])
 
-  const fetchPages = useCallback(async () => {
-    // Timer to detect slow connections (> 3500ms)
+  const fetchPages = useCallback(async (isManualRetry = false) => {
+    if (isFetchingRef.current) return
+    isFetchingRef.current = true
+
+    if (isManualRetry) {
+      retryCountRef.current = 0
+    }
+
+    // Timer to detect slow connections (> 3000ms)
     const slowTimer = setTimeout(() => {
       setIsSlowConnection(true)
-    }, 3500)
+    }, 3000)
 
     try {
-      // If we don't have pages yet, show loading skeleton
       setPages((current) => {
         if (current.length === 0) {
           setLoading(true)
@@ -87,15 +96,36 @@ export function usePages(): UsePagesReturn {
       setError(null)
 
       const data = await getPagesApi()
-      setPages(data)
-      setLocalCache(data)
+      const validPages = Array.isArray(data) ? data : []
+      
+      setPages(validPages)
+      if (validPages.length > 0) {
+        setLocalCache(validPages)
+      }
       setError(null)
+      retryCountRef.current = 0 // Reset retries on success
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to fetch pages'
-      setError(errorMessage)
-      // If we have cached pages, keep them in place so the screen is never blank!
+      console.warn('[usePages] Fetch attempt failed:', errorMessage)
+
+      // Automatic retry logic (up to 3 automatic retries with backoff)
+      if (retryCountRef.current < 3) {
+        retryCountRef.current += 1
+        const delay = retryCountRef.current * 1500
+        console.log(`[usePages] Auto-retrying fetch (${retryCountRef.current}/3) in ${delay}ms...`)
+        
+        if (retryTimeoutRef.current) clearTimeout(retryTimeoutRef.current)
+        retryTimeoutRef.current = setTimeout(() => {
+          isFetchingRef.current = false
+          fetchPages()
+        }, delay)
+        return // Keep loading state active during retry!
+      } else {
+        setError(errorMessage)
+      }
     } finally {
       clearTimeout(slowTimer)
+      isFetchingRef.current = false
       setIsSlowConnection(false)
       setLoading(false)
       setIsRevalidating(false)
@@ -184,6 +214,9 @@ export function usePages(): UsePagesReturn {
 
   useEffect(() => {
     fetchPages()
+    return () => {
+      if (retryTimeoutRef.current) clearTimeout(retryTimeoutRef.current)
+    }
   }, [fetchPages])
 
   return {
@@ -197,6 +230,6 @@ export function usePages(): UsePagesReturn {
     deletePage: handleDeletePage,
     duplicatePage: handleDuplicatePage,
     searchPages: handleSearchPages,
-    refreshPages: fetchPages,
+    refreshPages: () => fetchPages(true),
   }
 }

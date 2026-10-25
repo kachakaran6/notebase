@@ -22,7 +22,7 @@ function getCachedDoc(id: string): Page | null {
 }
 
 function setCachedDoc(id: string, page: Page) {
-  if (typeof window === 'undefined' || !id) return
+  if (typeof window === 'undefined' || !id || !page) return
   try {
     sessionStorage.setItem(`notebase_doc_${id}`, JSON.stringify(page))
   } catch {
@@ -34,13 +34,13 @@ export function usePage(pageId: string): UsePageReturn {
   const [page, setPage] = useState<Page | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const hasInitialized = useRef(false)
+  
+  const retryCountRef = useRef(0)
+  const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   // Instant render from session cache if available
   useEffect(() => {
-    if (hasInitialized.current || !pageId) return
-    hasInitialized.current = true
-
+    if (!pageId) return
     const cached = getCachedDoc(pageId)
     if (cached) {
       setPage(cached)
@@ -48,23 +48,41 @@ export function usePage(pageId: string): UsePageReturn {
     }
   }, [pageId])
 
-  const fetchPage = useCallback(async () => {
+  const fetchPage = useCallback(async (isManual = false) => {
     if (!pageId) return
+
+    if (isManual) {
+      retryCountRef.current = 0
+    }
+
     try {
-      setPage((current) => {
-        if (!current) setLoading(true)
-        return current
-      })
+      if (!page) setLoading(true)
       setError(null)
       const data = await getPage(pageId)
       setPage(data)
       setCachedDoc(pageId, data)
+      setError(null)
+      retryCountRef.current = 0
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch page')
+      const msg = err instanceof Error ? err.message : 'Failed to fetch page'
+      console.warn('[usePage] Fetch failed:', msg)
+
+      // Auto-retry up to 3 times
+      if (retryCountRef.current < 3) {
+        retryCountRef.current += 1
+        const delay = retryCountRef.current * 1500
+        if (retryTimeoutRef.current) clearTimeout(retryTimeoutRef.current)
+        retryTimeoutRef.current = setTimeout(() => {
+          fetchPage()
+        }, delay)
+        return
+      }
+
+      setError(msg)
     } finally {
       setLoading(false)
     }
-  }, [pageId])
+  }, [pageId, page])
 
   const handleUpdatePage = async (updates: Partial<Page>): Promise<Page> => {
     try {
@@ -86,6 +104,9 @@ export function usePage(pageId: string): UsePageReturn {
 
   useEffect(() => {
     fetchPage()
+    return () => {
+      if (retryTimeoutRef.current) clearTimeout(retryTimeoutRef.current)
+    }
   }, [fetchPage])
 
   return {
@@ -94,6 +115,6 @@ export function usePage(pageId: string): UsePageReturn {
     error,
     updatePage: handleUpdatePage,
     updatePageVisibility: handleUpdatePageVisibility,
-    refreshPage: fetchPage,
+    refreshPage: () => fetchPage(true),
   }
 }

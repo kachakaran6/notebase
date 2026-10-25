@@ -2,25 +2,49 @@ import { drizzle } from 'drizzle-orm/mysql2'
 import mysql from 'mysql2/promise'
 import * as schema from './db-schema'
 
-if (!process.env.DATABASE_URL) {
-  throw new Error('DATABASE_URL environment variable is required')
-}
-
 const globalForDb = globalThis as unknown as { pool: mysql.Pool }
 
-const pool = globalForDb.pool ?? mysql.createPool({
-  uri: process.env.DATABASE_URL,
-  waitForConnections: true,
-  connectionLimit: 10,
-  maxIdle: 10,
-  idleTimeout: 60000,
-  queueLimit: 0,
-  enableKeepAlive: true,
-  keepAliveInitialDelay: 0,
-  ssl: process.env.DATABASE_URL.includes('sslmode=') || process.env.DATABASE_URL.includes('ssl=')
-    ? { rejectUnauthorized: false }
-    : undefined,
-})
+function getPoolConfig() {
+  const rawUrl = (process.env.DATABASE_URL || '').trim().replace(/^["']|["']$/g, '')
+  if (!rawUrl) {
+    // Safe placeholder for build phase if env is momentarily omitted
+    return {
+      host: '127.0.0.1',
+      port: 3306,
+      user: 'notebase',
+      password: '',
+      database: 'notebase',
+    }
+  }
+
+  try {
+    const parsed = new URL(rawUrl)
+    return {
+      host: parsed.hostname || '127.0.0.1',
+      port: Number(parsed.port) || 3306,
+      user: decodeURIComponent(parsed.username || 'notebase'),
+      password: decodeURIComponent(parsed.password || ''),
+      database: parsed.pathname ? parsed.pathname.replace(/^\//, '') : 'notebase',
+      ssl: { rejectUnauthorized: false },
+      waitForConnections: true,
+      connectionLimit: 10,
+      maxIdle: 5,
+      idleTimeout: 60000,
+      queueLimit: 0,
+      enableKeepAlive: true,
+      keepAliveInitialDelay: 0,
+    }
+  } catch {
+    return {
+      uri: rawUrl,
+      ssl: { rejectUnauthorized: false },
+      waitForConnections: true,
+      connectionLimit: 10,
+    }
+  }
+}
+
+const pool = globalForDb.pool ?? mysql.createPool(getPoolConfig())
 
 if (process.env.NODE_ENV !== 'production') {
   globalForDb.pool = pool
