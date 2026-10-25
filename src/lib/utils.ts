@@ -42,3 +42,27 @@ export function truncate(text: string, length: number): string {
 export function stripHtml(html: string): string {
   return html.replace(/<[^>]*>/g, '').trim()
 }
+
+// Convert HTML to clean plain text with preserved line breaks and formatting
+export function htmlToPlainText(html: string): string {
+  if (!html) return ''
+  let text = html
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/p>/gi, '\n\n')
+    .replace(/<\/h[1-6]>/gi, '\n\n')
+    .replace(/<\/li>/gi, '\n')
+    .replace(/<li>/gi, '• ')
+    .replace(/<\/div>/gi, '\n')
+    .replace(/<\/tr>/gi, '\n')
+    .replace(/<[^>]*>/g, '')
+
+  text = text
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'")
+
+  return text.replace(/\n{3,}/g, '\n\n').trim()
+}

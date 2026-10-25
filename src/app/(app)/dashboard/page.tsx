@@ -74,7 +74,7 @@ import {
 } from '@/components/ui/command'
 import { usePages } from '@/hooks/use-pages'
 import { Page, Template, Visibility } from '@/types/page'
-import { formatRelativeTime, stripHtml } from '@/lib/utils'
+import { formatRelativeTime, stripHtml, htmlToPlainText } from '@/lib/utils'
 import { toast } from 'sonner'
 
 import { BrandLogo } from '@/components/brand-logo'
@@ -177,6 +177,7 @@ export default function DashboardPage() {
   const [quickNoteContent, setQuickNoteContent] = useState('')
   const [quickNoteSaving, setQuickNoteSaving] = useState(false)
   const [copiedId, setCopiedId] = useState<string | null>(null)
+  const [copiedContentId, setCopiedContentId] = useState<string | null>(null)
   const [pageToDelete, setPageToDelete] = useState<Page | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
 
@@ -274,6 +275,24 @@ export default function DashboardPage() {
       setTimeout(() => setCopiedId(null), 2000)
     } catch (err) {
       toast.error('Failed to copy link')
+    }
+  }
+
+  const handleCopyContent = async (page: Page, e?: React.MouseEvent) => {
+    e?.stopPropagation()
+    const textToCopy = htmlToPlainText(page.content || '')
+    if (!textToCopy.trim()) {
+      toast.info('Document is empty')
+      return
+    }
+
+    try {
+      await navigator.clipboard.writeText(textToCopy)
+      setCopiedContentId(page.id)
+      toast.success('Document content copied to clipboard')
+      setTimeout(() => setCopiedContentId(null), 2000)
+    } catch (err) {
+      toast.error('Failed to copy content')
     }
   }
 
@@ -885,7 +904,22 @@ export default function DashboardPage() {
                         </h3>
                       </div>
 
-                      <div onClick={(e) => e.stopPropagation()} className="shrink-0">
+                      <div onClick={(e) => e.stopPropagation()} className="shrink-0 flex items-center gap-0.5">
+                        {/* Direct 1-Click Copy Content */}
+                        <button
+                          type="button"
+                          onClick={(e) => handleCopyContent(page, e)}
+                          className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted transition cursor-pointer"
+                          title="Copy content"
+                          aria-label="Copy content"
+                        >
+                          {copiedContentId === page.id ? (
+                            <Check className="w-3.5 h-3.5 text-success" />
+                          ) : (
+                            <Copy className="w-3.5 h-3.5" />
+                          )}
+                        </button>
+
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <button
@@ -897,9 +931,21 @@ export default function DashboardPage() {
                               <MoreHorizontal className="w-3.5 h-3.5" />
                             </button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-40">
+                          <DropdownMenuContent align="end" className="w-44">
+                            <DropdownMenuItem onClick={(e) => handleCopyContent(page, e)}>
+                              {copiedContentId === page.id ? (
+                                <Check className="w-3.5 h-3.5 mr-2 text-success" />
+                              ) : (
+                                <Copy className="w-3.5 h-3.5 mr-2 text-muted-foreground" />
+                              )}
+                              <span>Copy content</span>
+                            </DropdownMenuItem>
                             <DropdownMenuItem onClick={(e) => handleCopyLink(page, e)}>
-                              <Copy className="w-3.5 h-3.5 mr-2 text-muted-foreground" />
+                              {copiedId === page.id ? (
+                                <Check className="w-3.5 h-3.5 mr-2 text-success" />
+                              ) : (
+                                <LinkIcon className="w-3.5 h-3.5 mr-2 text-muted-foreground" />
+                              )}
                               <span>Copy link</span>
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={(e) => handleDuplicate(page.id, e)}>
@@ -1003,6 +1049,20 @@ export default function DashboardPage() {
                         )}
                       </div>
 
+                      {/* Direct Copy Content */}
+                      <button
+                        onClick={(e) => handleCopyContent(page, e)}
+                        title="Copy Content"
+                        className="p-1 rounded text-muted-foreground hover:text-foreground hover:bg-muted transition cursor-pointer"
+                        aria-label="Copy content"
+                      >
+                        {copiedContentId === page.id ? (
+                          <Check className="w-3.5 h-3.5 text-success" />
+                        ) : (
+                          <Copy className="w-3.5 h-3.5" />
+                        )}
+                      </button>
+
                       <button
                         onClick={(e) => handleCopyLink(page, e)}
                         title="Copy Link"
@@ -1012,7 +1072,7 @@ export default function DashboardPage() {
                         {copiedId === page.id ? (
                           <Check className="w-3.5 h-3.5 text-success" />
                         ) : (
-                          <Copy className="w-3.5 h-3.5" />
+                          <LinkIcon className="w-3.5 h-3.5" />
                         )}
                       </button>
 

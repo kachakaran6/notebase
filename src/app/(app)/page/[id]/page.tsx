@@ -54,6 +54,7 @@ import { usePage } from '@/hooks/use-page'
 import { Page, Visibility, Template, Font, Background, Accent } from '@/types/page'
 import dynamic from 'next/dynamic'
 import { createShareLink, getShareLinks, revokeShareLink } from '@/lib/client-api'
+import { htmlToPlainText } from '@/lib/utils'
 import { toast } from 'sonner'
 
 const TiptapEditor = dynamic(() => import('@/components/editor/tiptap-editor'), {
@@ -135,6 +136,7 @@ export default function PageEditorPage() {
   const [shareToken, setShareToken] = useState<string | null>(null)
   const [shareUrl, setShareUrl] = useState<string | null>(null)
   const [copiedLink, setCopiedLink] = useState(false)
+  const [copiedContent, setCopiedContent] = useState(false)
   const [shareLoading, setShareLoading] = useState(false)
   const [isStylePopoverOpen, setIsStylePopoverOpen] = useState(false)
 
@@ -292,6 +294,22 @@ export default function PageEditorPage() {
       setTimeout(() => setCopiedLink(false), 2000)
     } catch (e) {
       toast.error('Failed to copy')
+    }
+  }
+
+  const handleCopyContent = async () => {
+    const text = htmlToPlainText(content || '')
+    if (!text.trim()) {
+      toast.info('Document is empty')
+      return
+    }
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopiedContent(true)
+      toast.success('Document content copied to clipboard')
+      setTimeout(() => setCopiedContent(false), 2000)
+    } catch {
+      toast.error('Failed to copy content')
     }
   }
 
@@ -492,6 +510,27 @@ export default function PageEditorPage() {
               </div>
             </PopoverContent>
           </Popover>
+
+          {/* Copy Content Button */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleCopyContent}
+            className="text-xs font-normal gap-1 h-8 px-2 sm:px-2.5 shrink-0"
+            title="Copy document content"
+          >
+            {copiedContent ? (
+              <>
+                <Check className="w-3.5 h-3.5 text-success" />
+                <span className="hidden sm:inline text-success">Copied</span>
+              </>
+            ) : (
+              <>
+                <Copy className="w-3.5 h-3.5 text-muted-foreground" />
+                <span className="hidden sm:inline">Copy</span>
+              </>
+            )}
+          </Button>
 
           {/* Share Button */}
           <Button
