@@ -2,69 +2,54 @@ import { db } from './db'
 import { sql } from 'drizzle-orm'
 
 export async function initDb() {
-  console.log('Initializing database tables...')
+  console.log('Initializing MySQL database tables...')
   try {
-    // Create enums if not exists
-    await db.execute(sql`
-      DO $$ BEGIN
-        CREATE TYPE visibility AS ENUM ('private', 'unlisted', 'public');
-      EXCEPTION
-        WHEN duplicate_object THEN null;
-      END $$;
-    `)
-
-    await db.execute(sql`
-      DO $$ BEGIN
-        CREATE TYPE template AS ENUM ('blank', 'notes', 'checklist', 'prompt', 'project', 'meeting');
-      EXCEPTION
-        WHEN duplicate_object THEN null;
-      END $$;
-    `)
-
     // Create users table
     await db.execute(sql`
       CREATE TABLE IF NOT EXISTS users (
-        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        id VARCHAR(36) PRIMARY KEY,
         email VARCHAR(255) NOT NULL UNIQUE,
         password_hash VARCHAR(255) NOT NULL,
-        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-        updated_at TIMESTAMP NOT NULL DEFAULT NOW()
-      );
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     `)
 
     // Create pages table
     await db.execute(sql`
       CREATE TABLE IF NOT EXISTS pages (
-        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        id VARCHAR(36) PRIMARY KEY,
+        user_id VARCHAR(36) NOT NULL,
         title VARCHAR(255) NOT NULL,
         slug VARCHAR(255) NOT NULL UNIQUE,
-        content TEXT,
+        content MEDIUMTEXT,
         icon VARCHAR(100),
         cover VARCHAR(255),
-        template template NOT NULL DEFAULT 'blank',
-        visibility visibility NOT NULL DEFAULT 'private',
+        template ENUM('blank', 'notes', 'checklist', 'prompt', 'project', 'meeting') NOT NULL DEFAULT 'blank',
+        visibility ENUM('private', 'unlisted', 'public') NOT NULL DEFAULT 'private',
         font VARCHAR(50) DEFAULT 'inter',
         background VARCHAR(50) DEFAULT 'default',
         accent VARCHAR(50) DEFAULT 'blue',
-        created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-        updated_at TIMESTAMP NOT NULL DEFAULT NOW()
-      );
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     `)
 
     // Create share_links table
     await db.execute(sql`
       CREATE TABLE IF NOT EXISTS share_links (
-        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-        page_id UUID NOT NULL REFERENCES pages(id) ON DELETE CASCADE,
+        id VARCHAR(36) PRIMARY KEY,
+        page_id VARCHAR(36) NOT NULL,
         token VARCHAR(64) NOT NULL UNIQUE,
-        expires_at TIMESTAMP,
+        expires_at TIMESTAMP NULL,
         is_revoked BOOLEAN NOT NULL DEFAULT FALSE,
-        created_at TIMESTAMP NOT NULL DEFAULT NOW()
-      );
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (page_id) REFERENCES pages(id) ON DELETE CASCADE
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
     `)
 
-    console.log('Database initialized successfully!')
+    console.log('MySQL Database tables initialized successfully!')
   } catch (error) {
     console.error('Error initializing database:', error)
     throw error

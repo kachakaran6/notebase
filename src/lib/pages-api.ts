@@ -1,6 +1,6 @@
 import { db } from './db'
 import { pages, shareLinks } from './db-schema'
-import { eq, and, ilike, desc, or, ne } from 'drizzle-orm'
+import { eq, and, like, desc, or, ne } from 'drizzle-orm'
 import { nanoid } from './utils'
 import type { Page, NewPage } from './db-schema'
 
@@ -33,8 +33,10 @@ export async function createPage(
     visibility?: Visibility
   }
 ): Promise<Page> {
+  const id = crypto.randomUUID()
   const slug = generateSlug(data.title)
-  const [newPage] = await db.insert(pages).values({
+  await db.insert(pages).values({
+    id,
     userId,
     title: data.title,
     slug,
@@ -43,7 +45,9 @@ export async function createPage(
     cover: data.cover || null,
     template: data.template || 'blank',
     visibility: data.visibility || 'private',
-  }).returning()
+  })
+  const newPage = await getPageById(id)
+  if (!newPage) throw new Error('Failed to create page')
   return newPage
 }
 
@@ -74,8 +78,8 @@ export async function searchUserPages(userId: string, query: string): Promise<Pa
       and(
         eq(pages.userId, userId),
         or(
-          ilike(pages.title, `%${query}%`),
-          ilike(pages.content, `%${query}%`)
+          like(pages.title, `%${query}%`),
+          like(pages.content, `%${query}%`)
         )
       )
     )
@@ -127,24 +131,24 @@ export async function updatePage(
     payload.slug = normalizedSlug
   }
 
-  const [updatedPage] = await db
+  await db
     .update(pages)
     .set(payload)
     .where(and(eq(pages.id, id), eq(pages.userId, userId)))
-    .returning()
 
+  const updatedPage = await getPageById(id, userId)
   if (!updatedPage) throw new Error('Page not found or access denied')
   return updatedPage
 }
 
 // Delete a page
 export async function deletePage(id: string, userId: string): Promise<void> {
-  const result = await db
+  const existing = await getPageById(id, userId)
+  if (!existing) throw new Error('Page not found or access denied')
+
+  await db
     .delete(pages)
     .where(and(eq(pages.id, id), eq(pages.userId, userId)))
-    .returning()
-
-  if (result.length === 0) throw new Error('Page not found or access denied')
 }
 
 // Duplicate a page
@@ -152,7 +156,9 @@ export async function duplicatePage(id: string, userId: string): Promise<Page> {
   const original = await getPageById(id, userId)
   if (!original) throw new Error('Page not found or access denied')
 
-  const [newPage] = await db.insert(pages).values({
+  const newId = crypto.randomUUID()
+  await db.insert(pages).values({
+    id: newId,
     userId,
     title: `${original.title} (copy)`,
     slug: generateSlug(`${original.title} copy`),
@@ -164,7 +170,10 @@ export async function duplicatePage(id: string, userId: string): Promise<Page> {
     font: original.font,
     background: original.background,
     accent: original.accent,
-  }).returning()
+  })
+
+  const newPage = await getPageById(newId)
+  if (!newPage) throw new Error('Failed to duplicate page')
   return newPage
 }
 
@@ -195,13 +204,15 @@ export async function createShareLink(pageId: string, userId: string, expiresAt?
   if (existing) return existing.token
 
   const token = nanoid(16)
-  const [shareLink] = await db.insert(shareLinks).values({
+  const linkId = crypto.randomUUID()
+  await db.insert(shareLinks).values({
+    id: linkId,
     pageId,
     token,
     expiresAt: expiresAt || null,
-  }).returning()
+  })
 
-  return shareLink.token
+  return token
 }
 
 // Get page by share token

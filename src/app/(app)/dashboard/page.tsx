@@ -31,10 +31,14 @@ import {
   User,
   X,
   Menu,
+  RefreshCw,
+  AlertCircle,
+  CloudOff,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
 import { ThemeToggle } from '@/components/theme-toggle'
 import {
   DropdownMenu,
@@ -146,6 +150,8 @@ export default function DashboardPage() {
   const {
     pages,
     loading,
+    isRevalidating,
+    isSlowConnection,
     error,
     createPage,
     deletePage,
@@ -581,9 +587,17 @@ export default function DashboardPage() {
       <main className="flex-1 w-full max-w-[1400px] mx-auto px-3.5 sm:px-6 lg:px-8 py-4 sm:py-6">
         {/* Top Header Section */}
         <div className="mb-4 sm:mb-5">
-          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-foreground mb-1 break-words">
-            Pages
-          </h1>
+          <div className="flex items-center gap-3 mb-1">
+            <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-foreground break-words">
+              Pages
+            </h1>
+            {isRevalidating && (
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-muted text-muted-foreground border border-border/50 animate-pulse">
+                <RefreshCw className="w-2.5 h-2.5 animate-spin text-primary" />
+                <span>Syncing workspace...</span>
+              </div>
+            )}
+          </div>
           <p className="text-xs sm:text-sm text-secondary-foreground font-normal max-w-full break-words">
             Create, organize and share your notes, prompts and ideas.
           </p>
@@ -693,11 +707,122 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        {/* Offline Banner if cached pages shown but error occurred */}
+        {error && pages.length > 0 && (
+          <div className="mb-4 p-3 rounded-xl border border-amber-500/20 bg-amber-500/10 text-amber-800 dark:text-amber-200 text-xs flex items-center justify-between shadow-2xs">
+            <div className="flex items-center gap-2">
+              <CloudOff className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+              <span>Offline / Cached mode: Showing saved pages. Unable to reach server.</span>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => refreshPages()}
+              className="h-6 text-xs gap-1.5 border-amber-500/30 hover:bg-amber-500/10"
+            >
+              <RefreshCw className="w-3 h-3" />
+              Retry Sync
+            </Button>
+          </div>
+        )}
+
         {/* Content Section */}
-        {loading ? (
-          <div className="py-20 flex flex-col items-center justify-center text-muted-foreground">
-            <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin mb-3" />
-            <p className="text-xs">Loading pages...</p>
+        {loading && pages.length === 0 ? (
+          /* Rich Modern Skeleton Workspace Loader */
+          <div className="space-y-4">
+            <div className="flex items-center justify-between text-xs text-muted-foreground pb-2 border-b border-border/40">
+              <div className="flex items-center gap-2.5">
+                <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                <span className="font-medium text-foreground">Loading workspace...</span>
+                {isSlowConnection && (
+                  <span className="text-muted-foreground hidden sm:inline">
+                    (Connecting is taking longer than expected)
+                  </span>
+                )}
+              </div>
+              {isSlowConnection && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => refreshPages()}
+                  className="h-6 text-xs gap-1 text-primary hover:bg-muted"
+                >
+                  <RefreshCw className="w-3 h-3" /> Retry Now
+                </Button>
+              )}
+            </div>
+
+            {viewMode === 'grid' ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 sm:gap-3.5">
+                {Array.from({ length: 10 }).map((_, idx) => (
+                  <div
+                    key={idx}
+                    className="p-3.5 sm:p-4 rounded-xl border border-border bg-card flex flex-col justify-between h-[154px] shadow-2xs"
+                  >
+                    <div>
+                      <div className="flex items-start justify-between gap-2 mb-2.5">
+                        <div className="flex items-center gap-2 min-w-0 flex-1">
+                          <Skeleton className="w-7 h-7 rounded-lg shrink-0" />
+                          <Skeleton className="h-4 w-3/4 rounded-md" />
+                        </div>
+                        <Skeleton className="w-12 h-4 rounded-full shrink-0" />
+                      </div>
+                      <div className="space-y-1.5 mt-3">
+                        <Skeleton className="h-3 w-full rounded" />
+                        <Skeleton className="h-3 w-4/5 rounded" />
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between pt-2 border-t border-border/40">
+                      <Skeleton className="h-3 w-16 rounded" />
+                      <Skeleton className="h-3 w-10 rounded" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {Array.from({ length: 6 }).map((_, idx) => (
+                  <div
+                    key={idx}
+                    className="p-3 rounded-xl border border-border bg-card flex items-center justify-between gap-3 shadow-2xs"
+                  >
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <Skeleton className="w-7 h-7 rounded-lg shrink-0" />
+                      <div className="space-y-1.5 flex-1 min-w-0">
+                        <Skeleton className="h-4 w-1/3 rounded" />
+                        <Skeleton className="h-3 w-2/3 rounded" />
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <Skeleton className="w-14 h-4 rounded-full" />
+                      <Skeleton className="w-16 h-3 rounded" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        ) : error && pages.length === 0 ? (
+          /* Error State when connection fails and no cached pages */
+          <div className="py-16 sm:py-20 text-center max-w-md w-full mx-auto px-4">
+            <div className="w-12 h-12 mx-auto mb-3.5 rounded-xl border border-destructive/20 bg-destructive/10 flex items-center justify-center text-destructive">
+              <AlertCircle className="w-6 h-6" />
+            </div>
+            <h3 className="text-base font-semibold text-foreground mb-1">
+              Unable to load pages
+            </h3>
+            <p className="text-xs sm:text-sm text-muted-foreground mb-6 leading-relaxed">
+              {error || "Could not connect to the database. Please check your network connection or try again."}
+            </p>
+            <div className="flex items-center justify-center gap-2.5">
+              <Button onClick={() => refreshPages()} size="sm" className="gap-2">
+                <RefreshCw className="w-3.5 h-3.5" />
+                Try Again
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => window.location.reload()}>
+                Reload Page
+              </Button>
+            </div>
           </div>
         ) : filteredPages.length === 0 ? (
           /* Empty State */

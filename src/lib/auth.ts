@@ -82,12 +82,14 @@ export async function signUp(email: string, password: string): Promise<SessionUs
   }
 
   const passwordHash = await bcrypt.hash(password, 12)
-  const [newUser] = await db.insert(users).values({
+  const id = crypto.randomUUID()
+  await db.insert(users).values({
+    id,
     email: email.toLowerCase(),
     passwordHash,
-  }).returning()
+  })
 
-  const sessionUser: SessionUser = { id: newUser.id, email: newUser.email }
+  const sessionUser: SessionUser = { id, email: email.toLowerCase() }
   const token = await signToken(sessionUser)
 
   const cookieStore = await cookies()
