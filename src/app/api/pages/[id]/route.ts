@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getCurrentUser } from '@/lib/auth'
 import { getPageById, updatePage, deletePage, duplicatePage } from '@/lib/pages-api'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
