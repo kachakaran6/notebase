@@ -37,6 +37,9 @@ export function usePage(pageId: string): UsePageReturn {
   
   const retryCountRef = useRef(0)
   const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const isFetchingRef = useRef(false)
+  const pageRef = useRef<Page | null>(null)
+  pageRef.current = page
 
   // Instant render from session cache if available
   useEffect(() => {
@@ -50,13 +53,15 @@ export function usePage(pageId: string): UsePageReturn {
 
   const fetchPage = useCallback(async (isManual = false) => {
     if (!pageId) return
+    if (isFetchingRef.current && !isManual) return
+    isFetchingRef.current = true
 
     if (isManual) {
       retryCountRef.current = 0
     }
 
     try {
-      if (!page) setLoading(true)
+      if (!pageRef.current) setLoading(true)
       setError(null)
       const data = await getPage(pageId)
       setPage(data)
@@ -73,6 +78,7 @@ export function usePage(pageId: string): UsePageReturn {
         const delay = retryCountRef.current * 1500
         if (retryTimeoutRef.current) clearTimeout(retryTimeoutRef.current)
         retryTimeoutRef.current = setTimeout(() => {
+          isFetchingRef.current = false
           fetchPage()
         }, delay)
         return
@@ -80,9 +86,11 @@ export function usePage(pageId: string): UsePageReturn {
 
       setError(msg)
     } finally {
+      isFetchingRef.current = false
       setLoading(false)
     }
-  }, [pageId, page])
+  }, [pageId])
+
 
   const handleUpdatePage = async (updates: Partial<Page>): Promise<Page> => {
     try {

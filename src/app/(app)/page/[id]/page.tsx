@@ -1,7 +1,8 @@
 "use client"
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useRouter, useParams } from 'next/navigation'
+
 import Link from 'next/link'
 import {
   ArrowLeft,
@@ -145,9 +146,13 @@ export default function PageEditorPage() {
   const [isEditingSlug, setIsEditingSlug] = useState(false)
   const [isSavingSlug, setIsSavingSlug] = useState(false)
 
+  // Track page ID so initial form load runs once per document without wiping active edits
+  const initializedPageIdRef = useRef<string | null>(null)
+
   // Initialize state once page is fetched
   useEffect(() => {
-    if (page) {
+    if (page && initializedPageIdRef.current !== page.id) {
+      initializedPageIdRef.current = page.id
       setTitle(page.title || '')
       setContent(page.content || '')
       setIcon(page.icon || 'FileText')
@@ -160,6 +165,7 @@ export default function PageEditorPage() {
       setLastSaved(new Date(page.updatedAt))
     }
   }, [page])
+
 
   // Save handler
   const handleSave = useCallback(async () => {

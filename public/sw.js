@@ -1,5 +1,5 @@
 // Notebase Service Worker for PWA Offline Caching & Installability
-const CACHE_NAME = 'notebase-v1'
+const CACHE_NAME = 'notebase-v2'
 const ASSETS_TO_CACHE = [
   '/',
   '/notebase.png',
@@ -33,15 +33,22 @@ self.addEventListener('activate', (event) => {
 })
 
 self.addEventListener('fetch', (event) => {
-  // Only cache GET requests
+  // Only handle HTTP/HTTPS GET requests
   if (event.request.method !== 'GET') return
+  if (!event.request.url.startsWith('http')) return
 
-  // Skip API routes, auth, and external requests
   const url = new URL(event.request.url)
+
+  // Skip API routes, auth, Next.js internal/dev routes, and external origins
   if (
+    url.origin !== self.location.origin ||
     url.pathname.startsWith('/api/') ||
     url.pathname.startsWith('/auth/') ||
-    url.origin !== self.location.origin
+    url.pathname.startsWith('/_next/webpack-hmr') ||
+    url.pathname.startsWith('/_next/static/webpack/') ||
+    url.pathname.includes('__next') ||
+    url.searchParams.has('_rsc') ||
+    event.request.headers.get('RSC') === '1'
   ) {
     return
   }
@@ -49,23 +56,36 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        // If good response, clone and cache
-        if (response.status === 200) {
+        // Only cache valid basic responses
+        if (response && response.status === 200 && response.type === 'basic') {
           const responseClone = response.clone()
           caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseClone)
+            cache.put(event.request, responseClone).catch(() => {})
           })
         }
         return response
       })
-      .catch(() => {
-        return caches.match(event.request).then((cachedResponse) => {
+      .catch(async () => {
+        try {
+          const cachedResponse = await caches.match(event.request)
           if (cachedResponse) return cachedResponse
-          // If offline and request is for a page, fallback to cached root
+
+          // If offline and request is for navigation, fallback to cached root
           if (event.request.mode === 'navigate') {
-            return caches.match('/')
+            const fallback = await caches.match('/')
+            if (fallback) return fallback
           }
+        } catch {
+          // ignore cache lookup errors
+        }
+
+        // CRITICAL: respondWith() MUST ALWAYS resolve to a valid Response instance, never undefined!
+        return new Response('Network error occurred. Please check your connection.', {
+          status: 503,
+          statusText: 'Service Unavailable',
+          headers: { 'Content-Type': 'text/plain' },
         })
       })
   )
 })
+
