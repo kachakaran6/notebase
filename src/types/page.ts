@@ -34,6 +34,8 @@ export const pageSchema = z.object({
   font: z.string().default('inter'),
   background: z.string().default('default'),
   accent: z.string().default('blue'),
+  isAnalyticsEnabled: z.boolean().default(true),
+  isCommentsEnabled: z.boolean().default(true),
   createdAt: z.union([z.date(), z.string()]),
   updatedAt: z.union([z.date(), z.string()]),
 })
@@ -46,6 +48,8 @@ export const newPageSchema = z.object({
   cover: z.string().max(255).optional(),
   template: z.enum(TEMPLATES).default('blank'),
   visibility: z.enum(VISIBILITY).default('private'),
+  isAnalyticsEnabled: z.boolean().default(true).optional(),
+  isCommentsEnabled: z.boolean().default(true).optional(),
 })
 
 // Page API types
@@ -62,6 +66,8 @@ export interface Page {
   font: string | null
   background: string | null
   accent: string | null
+  isAnalyticsEnabled: boolean
+  isCommentsEnabled: boolean
   createdAt: Date | string
   updatedAt: Date | string
 }
@@ -76,6 +82,38 @@ export interface ShareLink {
   expiresAt: Date | string | null
   createdAt: Date | string
   isRevoked: boolean
+}
+
+// Analytics event types
+export interface PageAnalyticsEvent {
+  id: string
+  pageId: string
+  sessionId: string
+  eventType: string
+  readTimeSeconds: number
+  scrollDepthPercent: number
+  referrer: string | null
+  deviceType: string | null
+  browser: string | null
+  os: string | null
+  country: string | null
+  createdAt: Date | string
+  updatedAt: Date | string
+}
+
+// Page Comment types
+export interface PageComment {
+  id: string
+  pageId: string
+  userId?: string | null
+  authorName: string
+  authorEmail?: string | null
+  content: string
+  isPinned: boolean
+  isHidden: boolean
+  likesCount: number
+  createdAt: Date | string
+  updatedAt: Date | string
 }
 
 // API response types

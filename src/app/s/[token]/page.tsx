@@ -10,6 +10,8 @@ import {
 import type { Metadata } from 'next'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { BrandLogo } from '@/components/brand-logo'
+import { AnalyticsTracker } from '@/components/analytics-tracker'
+import { LiveComments } from '@/components/live-comments'
 
 interface Props {
   params: Promise<{ token: string }>
@@ -50,6 +52,9 @@ export default async function SharedPage({ params }: Props) {
     <div
       className={`min-h-screen ${fontClass} ${bgClass} flex flex-col font-inter transition-colors`}
     >
+      {/* Real-time Telemetry Analytics Tracker */}
+      <AnalyticsTracker pageId={page.id} isAnalyticsEnabled={page.isAnalyticsEnabled} />
+
       {/* Top Banner Header (Edge-to-edge) */}
       <header className="border-b border-border bg-card sticky top-0 z-30">
         <div className="w-full px-3.5 sm:px-6 lg:px-8 h-12 flex items-center justify-between gap-2 min-w-0">
@@ -98,6 +103,13 @@ export default async function SharedPage({ params }: Props) {
             }}
           />
         </article>
+
+        {/* Live Active Comments Section */}
+        <LiveComments
+          pageId={page.id}
+          isCommentsEnabled={page.isCommentsEnabled}
+          pageTitle={page.title}
+        />
       </main>
 
       {/* Subtle Footer */}

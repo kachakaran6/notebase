@@ -31,7 +31,11 @@ import {
   Send,
   MoreHorizontal,
   ChevronRight,
+  BarChart3,
+  Activity,
+  MessageSquare,
 } from 'lucide-react'
+import { Switch } from '@/components/ui/switch'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card } from '@/components/ui/card'
@@ -146,6 +150,10 @@ export default function PageEditorPage() {
   const [isEditingSlug, setIsEditingSlug] = useState(false)
   const [isSavingSlug, setIsSavingSlug] = useState(false)
 
+  // Analytics & Comments Settings
+  const [isAnalyticsEnabled, setIsAnalyticsEnabled] = useState(true)
+  const [isCommentsEnabled, setIsCommentsEnabled] = useState(true)
+
   // Track page ID so initial form load runs once per document without wiping active edits
   const initializedPageIdRef = useRef<string | null>(null)
 
@@ -162,9 +170,33 @@ export default function PageEditorPage() {
       setBackground((page.background as Background) || 'default')
       setAccent((page.accent as Accent) || 'blue')
       setSlugInput(page.slug || '')
+      setIsAnalyticsEnabled(page.isAnalyticsEnabled ?? true)
+      setIsCommentsEnabled(page.isCommentsEnabled ?? true)
       setLastSaved(new Date(page.updatedAt))
     }
   }, [page])
+
+  const handleToggleAnalytics = async (enabled: boolean) => {
+    setIsAnalyticsEnabled(enabled)
+    try {
+      await updatePage({ isAnalyticsEnabled: enabled })
+      toast.success(enabled ? 'Page Analytics tracking enabled' : 'Page Analytics paused')
+    } catch {
+      setIsAnalyticsEnabled(!enabled)
+      toast.error('Failed to update analytics setting')
+    }
+  }
+
+  const handleToggleComments = async (enabled: boolean) => {
+    setIsCommentsEnabled(enabled)
+    try {
+      await updatePage({ isCommentsEnabled: enabled })
+      toast.success(enabled ? 'Visitor comments enabled' : 'Visitor comments disabled')
+    } catch {
+      setIsCommentsEnabled(!enabled)
+      toast.error('Failed to update comments setting')
+    }
+  }
 
 
   // Save handler
@@ -538,6 +570,18 @@ export default function PageEditorPage() {
             )}
           </Button>
 
+          {/* Analytics Button */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => router.push(`/analytics?pageId=${pageId}`)}
+            className="text-xs font-normal gap-1 h-8 px-2 sm:px-2.5 shrink-0 text-muted-foreground hover:text-foreground cursor-pointer"
+            title="View Page Analytics & Reading Insights"
+          >
+            <BarChart3 className="w-3.5 h-3.5 text-primary" />
+            <span className="hidden sm:inline">Analytics</span>
+          </Button>
+
           {/* Share Button */}
           <Button
             variant="outline"
@@ -847,6 +891,63 @@ export default function PageEditorPage() {
                 )}
               </div>
             )}
+
+            {/* Engagement & Analytics Section */}
+            <div className="pt-3 border-t border-border space-y-2.5">
+              <div className="flex items-center justify-between">
+                <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground block">
+                  Sharing Intelligence & Settings
+                </label>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setShowShareModal(false)
+                    router.push(`/analytics?pageId=${pageId}`)
+                  }}
+                  className="h-6 text-[11px] text-primary hover:text-primary gap-1 px-1.5 cursor-pointer"
+                >
+                  <BarChart3 className="w-3 h-3" />
+                  <span>View Analytics ↗</span>
+                </Button>
+              </div>
+
+              {/* Analytics Toggle */}
+              <div className="p-3 rounded-lg border border-border bg-card flex items-center justify-between gap-3">
+                <div className="space-y-0.5">
+                  <div className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                    <Activity className="w-3.5 h-3.5 text-primary" />
+                    <span>Track Page Analytics</span>
+                  </div>
+                  <div className="text-[11px] text-muted-foreground leading-normal">
+                    Record views, unique readers, active dwell time, and scroll depth.
+                  </div>
+                </div>
+                <Switch
+                  checked={isAnalyticsEnabled}
+                  onCheckedChange={handleToggleAnalytics}
+                  aria-label="Toggle page analytics"
+                />
+              </div>
+
+              {/* Comments Toggle */}
+              <div className="p-3 rounded-lg border border-border bg-card flex items-center justify-between gap-3">
+                <div className="space-y-0.5">
+                  <div className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                    <MessageSquare className="w-3.5 h-3.5 text-primary" />
+                    <span>Enable Live Comments</span>
+                  </div>
+                  <div className="text-[11px] text-muted-foreground leading-normal">
+                    Allow visitors to post live thoughts and view discussions.
+                  </div>
+                </div>
+                <Switch
+                  checked={isCommentsEnabled}
+                  onCheckedChange={handleToggleComments}
+                  aria-label="Toggle live comments"
+                />
+              </div>
+            </div>
           </div>
 
           <DialogFooter>

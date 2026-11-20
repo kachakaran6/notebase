@@ -34,6 +34,7 @@ import {
   RefreshCw,
   AlertCircle,
   CloudOff,
+  BarChart3,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -389,6 +390,17 @@ export default function DashboardPage() {
 
           {/* Right Actions (Desktop / Tablet) */}
           <div className="hidden sm:flex items-center gap-2 shrink-0">
+            {/* Analytics Dashboard Button */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => router.push('/analytics')}
+              className="text-xs font-medium gap-1.5 h-8 px-2.5 text-muted-foreground hover:text-foreground cursor-pointer"
+            >
+              <BarChart3 className="w-3.5 h-3.5 text-primary" />
+              <span>Analytics</span>
+            </Button>
+
             {/* Quick Note Button */}
             <Button
               variant="outline"
@@ -460,6 +472,10 @@ export default function DashboardPage() {
                   <Search className="w-3.5 h-3.5 mr-2 text-muted-foreground" />
                   <span>Command Menu</span>
                   <span className="ml-auto text-[10px] font-mono text-subtle-foreground">⌘K</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push('/analytics')}>
+                  <BarChart3 className="w-3.5 h-3.5 mr-2 text-primary" />
+                  <span>Analytics Dashboard</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => handleCreateWithTemplate('blank')}>
                   <FilePlus className="w-3.5 h-3.5 mr-2 text-muted-foreground" />
@@ -952,6 +968,15 @@ export default function DashboardPage() {
                               <FolderPlus className="w-3.5 h-3.5 mr-2 text-muted-foreground" />
                               <span>Duplicate</span>
                             </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                router.push(`/analytics?pageId=${page.id}`)
+                              }}
+                            >
+                              <BarChart3 className="w-3.5 h-3.5 mr-2 text-primary" />
+                              <span>View Analytics</span>
+                            </DropdownMenuItem>
                             <DropdownMenuSeparator />
                             <DropdownMenuItem
                               onClick={(e) => {
@@ -1074,6 +1099,18 @@ export default function DashboardPage() {
                         ) : (
                           <LinkIcon className="w-3.5 h-3.5" />
                         )}
+                      </button>
+
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          router.push(`/analytics?pageId=${page.id}`)
+                        }}
+                        title="View Analytics"
+                        className="p-1 rounded text-muted-foreground hover:text-primary hover:bg-muted transition cursor-pointer"
+                        aria-label="View analytics"
+                      >
+                        <BarChart3 className="w-3.5 h-3.5" />
                       </button>
 
                       <button

@@ -31,6 +31,8 @@ export async function createPage(
     cover?: string
     template?: Template
     visibility?: Visibility
+    isAnalyticsEnabled?: boolean
+    isCommentsEnabled?: boolean
   }
 ): Promise<Page> {
   const id = crypto.randomUUID()
@@ -45,6 +47,8 @@ export async function createPage(
     cover: data.cover || null,
     template: data.template || 'blank',
     visibility: data.visibility || 'private',
+    isAnalyticsEnabled: data.isAnalyticsEnabled ?? true,
+    isCommentsEnabled: data.isCommentsEnabled ?? true,
   })
   const newPage = await getPageById(id)
   if (!newPage) throw new Error('Failed to create page')
@@ -101,6 +105,8 @@ export async function updatePage(
     font: string
     background: string
     accent: string
+    isAnalyticsEnabled: boolean
+    isCommentsEnabled: boolean
   }>
 ): Promise<Page> {
   const payload: Record<string, unknown> = { ...updates, updatedAt: new Date() }

@@ -119,3 +119,62 @@ export async function revokeShareLink(token: string): Promise<void> {
     method: 'DELETE',
   })
 }
+
+// Analytics Client API
+export async function getAnalyticsOverview(filters?: {
+  pageId?: string
+  dateRange?: string
+  device?: string
+}): Promise<any> {
+  const params = new URLSearchParams()
+  if (filters?.pageId) params.append('pageId', filters.pageId)
+  if (filters?.dateRange) params.append('dateRange', filters.dateRange)
+  if (filters?.device) params.append('device', filters.device)
+  const qs = params.toString() ? `?${params.toString()}` : ''
+  return await fetchApi<any>(`/api/analytics/overview${qs}`)
+}
+
+// Comments Client API
+export async function getPageComments(pageId: string): Promise<{
+  comments: any[]
+  isCommentsEnabled: boolean
+  isOwner: boolean
+}> {
+  return await fetchApi<{
+    comments: any[]
+    isCommentsEnabled: boolean
+    isOwner: boolean
+  }>(`/api/comments?pageId=${pageId}`)
+}
+
+export async function createPageComment(data: {
+  pageId: string
+  authorName: string
+  authorEmail?: string
+  content: string
+}): Promise<any> {
+  return await fetchApi<any>('/api/comments', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  })
+}
+
+export async function deletePageComment(commentId: string): Promise<void> {
+  await fetchApi(`/api/comments/${commentId}`, {
+    method: 'DELETE',
+  })
+}
+
+export async function likePageComment(commentId: string): Promise<{ likesCount: number }> {
+  return await fetchApi<{ likesCount: number }>(`/api/comments/${commentId}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ action: 'like' }),
+  })
+}
+
+export async function togglePinPageComment(commentId: string): Promise<{ isPinned: boolean }> {
+  return await fetchApi<{ isPinned: boolean }>(`/api/comments/${commentId}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ action: 'pin' }),
+  })
+}
