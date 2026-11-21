@@ -36,6 +36,7 @@ import {
   MessageSquare,
 } from 'lucide-react'
 import { Switch } from '@/components/ui/switch'
+import { CommentsSidebar } from '@/components/comments-sidebar'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card } from '@/components/ui/card'
@@ -153,6 +154,8 @@ export default function PageEditorPage() {
   // Analytics & Comments Settings
   const [isAnalyticsEnabled, setIsAnalyticsEnabled] = useState(true)
   const [isCommentsEnabled, setIsCommentsEnabled] = useState(true)
+  const [showCommentsSidebar, setShowCommentsSidebar] = useState(false)
+  const [commentsCount, setCommentsCount] = useState(0)
 
   // Track page ID so initial form load runs once per document without wiping active edits
   const initializedPageIdRef = useRef<string | null>(null)
@@ -582,6 +585,23 @@ export default function PageEditorPage() {
             <span className="hidden sm:inline">Analytics</span>
           </Button>
 
+          {/* Comments Sidebar Button */}
+          <Button
+            variant={showCommentsSidebar ? 'secondary' : 'outline'}
+            size="sm"
+            onClick={() => setShowCommentsSidebar((prev) => !prev)}
+            className="text-xs font-normal gap-1.5 h-8 px-2 sm:px-2.5 shrink-0 text-muted-foreground hover:text-foreground cursor-pointer relative"
+            title="Open Document Comments"
+          >
+            <MessageSquare className="w-3.5 h-3.5 text-primary" />
+            <span className="hidden sm:inline">Comments</span>
+            {commentsCount > 0 && (
+              <span className="h-4 min-w-[16px] px-1 rounded-full bg-primary text-primary-foreground text-[10px] font-semibold flex items-center justify-center">
+                {commentsCount}
+              </span>
+            )}
+          </Button>
+
           {/* Share Button */}
           <Button
             variant="outline"
@@ -961,6 +981,17 @@ export default function PageEditorPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Right Comments Sidebar for Page Owner */}
+      <CommentsSidebar
+        isOpen={showCommentsSidebar}
+        onClose={() => setShowCommentsSidebar(false)}
+        pageId={pageId}
+        pageTitle={title || 'Untitled'}
+        isCommentsEnabled={isCommentsEnabled}
+        onToggleCommentsEnabled={handleToggleComments}
+        onCommentsCountChange={setCommentsCount}
+      />
     </div>
   )
 }
